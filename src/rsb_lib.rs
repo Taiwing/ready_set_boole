@@ -34,6 +34,7 @@ pub fn gray_code(n: u32) -> u32 {
     (tmp ^ (tmp >> 1)).try_into().unwrap()
 }
 
+//TODO: fetch_args() function
 pub fn eval_formula(formula: &str) -> bool {
     let stack: Vec<bool> = Vec::new();
 
