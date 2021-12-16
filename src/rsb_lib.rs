@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 pub fn adder(mut a: u32, mut b: u32) -> u32 {
     let mut newbit: u32;
     let mut carry: u32 = 0;
@@ -26,7 +28,9 @@ pub fn multiplier(mut a: u32, mut b: u32) -> u32 {
     result
 }
 
-pub fn gray_code(mut n: u32) -> u32 {
-   n 
+pub fn gray_code(n: u32) -> u32 {
+    let tmp: u64 = n.into();
+
+    (((tmp << 1) ^ tmp) >> 1).try_into().unwrap()
 }
 

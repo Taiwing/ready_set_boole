@@ -5,7 +5,7 @@ use gray_codes::GrayCode32;
 fn main() {
     adder_diff(1234, 4321);
     multiplier_diff(1234, 4321);
-    gray_code_diff(15);
+    gray_code_diff(1234);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -25,7 +25,8 @@ fn multiplier_diff(left: u32, right: u32) {
 fn gray_code_diff(n: u32) {
     let mine: u32 = gray_code(n);
     let orig: u32 = GrayCode32::from_index(n);
-    println!("gray_code({}): mine = {}, orig = {}", n, mine, orig);
+    println!("gray_code({} [{:#b}])): mine = {} [{:#b}], orig = {} [{:#b}]",
+        n, n, mine, mine, orig, orig);
     assert_eq!(mine, orig);
 }
 
@@ -104,6 +105,8 @@ mod tests {
         gray_code_diff(u32::MAX/4);
         gray_code_diff(u32::MAX/3);
         gray_code_diff(u32::MAX/2);
+        gray_code_diff(u32::MAX/2 + 1);
+        gray_code_diff(u32::MAX - 1);
         gray_code_diff(u32::MAX);
     }
 }
