@@ -34,3 +34,42 @@ pub fn gray_code(n: u32) -> u32 {
     (tmp ^ (tmp >> 1)).try_into().unwrap()
 }
 
+pub fn eval_formula(formula: &str) -> bool {
+    let stack: Vec<bool> = Vec::new();
+
+    if formula.len() == 0 {
+        panic!("formula string is empty");
+    }
+    for c in formula.chars() {
+        match c {
+            '0' => { stack.push(false); },
+            '1' => { stack.push(true); },
+            '!' => {
+                if let Some(a) = stack.pop() {
+                    stack.push(!a);
+                } else {
+                    panic!("operation '{}' requires an operand", c);
+                }
+            },
+            '&' | '|' | '^' | '>' | '=' => {
+                if let (Some(b), Some(a)) = (stack.pop(), stack.pop()) {
+                    if c == '&' {
+                        stack.push(a && b);
+                    } else if c == '|' {
+                        stack.push(a || b);
+                    } else if c == '^' {
+                        stack.push(a != b);
+                    } else if c == '>' {
+                        stack.push(a && b); //TODO
+                    } else if c == '=' {
+                        stack.push(a == b);
+                    }
+                } else {
+                    panic!("operation '{}' requires two operands", c);
+                }
+            },
+            _ => { panic!("'{}' is not a valid operand, must be one of: \"01!&|^>=\""); },
+        }
+    }
+    stack.pop().unwrap()
+}
