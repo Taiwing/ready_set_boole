@@ -21,7 +21,7 @@ fn adder(mut a: u32, mut b: u32) -> u32 {
 fn multiplier(mut a: u32, mut b: u32) -> u32 {
     let mut result: u32 = 0;
 
-    while a != 0 && b != 0 {
+    while a != 0 {
         if (a & 1) != 0 {
             result = adder(result, b);
         }
