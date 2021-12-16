@@ -31,6 +31,6 @@ pub fn multiplier(mut a: u32, mut b: u32) -> u32 {
 pub fn gray_code(n: u32) -> u32 {
     let tmp: u64 = n.into();
 
-    (((tmp << 1) ^ tmp) >> 1).try_into().unwrap()
+    (tmp ^ (tmp >> 1)).try_into().unwrap()
 }
 

@@ -88,18 +88,14 @@ mod tests {
 
     #[test]
     fn gray_code_less_basic() {
-        gray_code_diff(2);
-        gray_code_diff(3);
-        gray_code_diff(4);
-        gray_code_diff(5);
-        gray_code_diff(6);
-        gray_code_diff(7);
-        gray_code_diff(8);
+        for i in 0..16 {
+            gray_code_diff(i);
+        }
     }
 
     #[test]
     fn gray_code_big_numbers() {
-        gray_code_diff(15);
+        gray_code_diff(92948);
         gray_code_diff(2414);
         gray_code_diff(1234124);
         gray_code_diff(u32::MAX/4);
