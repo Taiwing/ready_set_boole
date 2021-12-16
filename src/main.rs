@@ -52,6 +52,7 @@ mod tests {
 
     #[test]
     fn adder_basics() {
+        test_adder(0, 0);
         test_adder(1, 0);
         test_adder(0, 1);
         test_adder(1, 1);
@@ -75,6 +76,7 @@ mod tests {
 
     #[test]
     fn multiplier_basics() {
+        test_multiplier(0, 0);
         test_multiplier(3, 6);
         test_multiplier(9, 71);
         test_multiplier(187, 18);
