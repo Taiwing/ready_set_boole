@@ -4,15 +4,14 @@ fn main() {
 }
 
 fn adder(mut a: u32, mut b: u32) -> u32 {
-    const BITLEN: u32 = 32;
     let mut newbit: u32;
     let mut carry: u32 = 0;
     let mut result: u32 = 0;
 
-    for _ in 0..BITLEN {
+    for _ in 0..32 {
         newbit = (carry ^ a ^ b) & 1;
         carry = if (a ^ b) & 1 != 0 { newbit ^ 1 } else { a & b & 1 };
-        result = (result >> 1) | (newbit << (BITLEN - 1));
+        result = (result >> 1) | (newbit << 31);
         a = a >> 1;
         b = b >> 1;
     }
