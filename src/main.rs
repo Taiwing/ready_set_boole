@@ -1,43 +1,20 @@
-use std::convert::TryInto;
-
 fn main() {
     test_adder(1234, 4321);
     test_multiplier(1234, 4321);
 }
 
-fn getbit(n: u32, i: u8) -> u8 {
-    ((n >> i) & 1).try_into().unwrap()
-}
-
-fn setbit(n: u32, i: u8, bit: u8) -> u32 {
-    if bit != 0 {
-        n | (1 << i)
-    } else if getbit(n, i) != 0 {
-        n ^ (1 << i)
-    } else {
-        n
-    }
-}
-
-fn adder(a: u32, b: u32) -> u32 {
-    const BITLEN: u8 = 32;
-    let mut bita: u8;
-    let mut bitb: u8;
-    let mut newbit: u8;
-    let mut carry: u8 = 0;
+fn adder(mut a: u32, mut b: u32) -> u32 {
+    const BITLEN: u32 = 32;
+    let mut newbit: u32;
+    let mut carry: u32 = 0;
     let mut result: u32 = 0;
 
-    for i in 0..BITLEN {
-        bita = getbit(a, i);
-        bitb = getbit(b, i);
-        newbit = carry;
-        if bita ^ bitb != 0 {
-            carry = newbit & 1;
-            newbit = newbit ^ 1;
-        } else {
-            carry = bita & bitb;
-        }
-        result = setbit(result, i, newbit);
+    for _ in 0..BITLEN {
+        newbit = (carry ^ a ^ b) & 1;
+        carry = if (a ^ b) & 1 != 0 { newbit ^ 1 } else { a & b & 1 };
+        result = (result >> 1) | (newbit << (BITLEN - 1));
+        a = a >> 1;
+        b = b >> 1;
     }
     result
 }
@@ -45,7 +22,7 @@ fn adder(a: u32, b: u32) -> u32 {
 fn multiplier(mut a: u32, mut b: u32) -> u32 {
     let mut result: u32 = 0;
 
-    while a != 0 {
+    while a != 0 && b != 0 {
         if (a & 1) != 0 {
             result = adder(result, b);
         }
