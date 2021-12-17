@@ -176,11 +176,13 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected = "the stack should be empty at the end")]
     fn bool_eval_unused_leading_zeroes() {
         assert_eq!(eval_formula("000001"), true);
     }
 
     #[test]
+    #[should_panic(expected = "the stack should be empty at the end")]
     fn bool_eval_unused_leading_ones() {
         assert_eq!(eval_formula("111110"), false);
     }

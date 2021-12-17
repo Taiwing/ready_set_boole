@@ -55,5 +55,8 @@ pub fn eval_formula(formula: &str) -> bool {
             _ => panic!("'{}' is not a valid op or is missing an argument", op),
         }
     }
+    if stack.len() > 1 {
+        panic!("the stack should be empty at the end");
+    }
     stack.pop().expect("nothing to return (stack is empty)")
 }
