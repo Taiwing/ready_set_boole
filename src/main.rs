@@ -132,8 +132,8 @@ mod tests {
         assert_eq!(eval_formula("10^"), true);
         assert_eq!(eval_formula("11^"), false);
         assert_eq!(eval_formula("00>"), true);
-        assert_eq!(eval_formula("01>"), false);
-        assert_eq!(eval_formula("10>"), true);
+        assert_eq!(eval_formula("01>"), true);
+        assert_eq!(eval_formula("10>"), false);
         assert_eq!(eval_formula("00="), true);
         assert_eq!(eval_formula("01="), false);
         assert_eq!(eval_formula("10="), false);

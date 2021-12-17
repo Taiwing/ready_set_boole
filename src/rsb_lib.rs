@@ -41,12 +41,12 @@ pub fn eval_formula(formula: &str) -> bool {
         panic!("formula string is empty");
     }
     for op in formula.chars() {
-        let arg_a = if "01".contains(op) { None } else { stack.pop() };
-        let arg_b = if "01!".contains(op) { None } else { stack.pop() };
-        match (op, arg_a, arg_b) {
+        let right = if "01".contains(op) { None } else { stack.pop() };
+        let left = if "01!".contains(op) { None } else { stack.pop() };
+        match (op, left, right) {
             ('0', None, None) => stack.push(false),
             ('1', None, None) => stack.push(true),
-            ('!', Some(a), None) => stack.push(!a),
+            ('!', None, Some(b)) => stack.push(!b),
             ('&', Some(a), Some(b)) => stack.push(a && b),
             ('|', Some(a), Some(b)) => stack.push(a || b),
             ('^', Some(a), Some(b)) => stack.push(a != b),
