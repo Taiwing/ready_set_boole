@@ -105,4 +105,13 @@ mod tests {
         gray_code_diff(u32::MAX - 1);
         gray_code_diff(u32::MAX);
     }
+
+    #[test]
+    fn bool_eval_subject_tests() {
+        assert_eq!(eval_formula("10&"), false);
+        assert_eq!(eval_formula("10|"), true);
+        assert_eq!(eval_formula("11>"), true);
+        assert_eq!(eval_formula("10="), false);
+        assert_eq!(eval_formula("1011||="), true);
+    }
 }
