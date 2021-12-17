@@ -6,6 +6,9 @@ fn main() {
     adder_diff(1234, 4321);
     multiplier_diff(1234, 4321);
     gray_code_diff(1234);
+    eval_formula("10&");
+    print_truth_table("AB&");
+    //print_truth_table("");
 }
 
 fn adder_diff(left: u32, right: u32) {
