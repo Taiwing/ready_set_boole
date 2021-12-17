@@ -139,4 +139,39 @@ mod tests {
         assert_eq!(eval_formula("10="), false);
         assert_eq!(eval_formula("11="), true);
     }
+
+    #[test]
+    fn bool_eval_negate() {
+        assert_eq!(eval_formula("10&!"), !false);
+        assert_eq!(eval_formula("10|!"), !true);
+        assert_eq!(eval_formula("11>!"), !true);
+        assert_eq!(eval_formula("10=!"), !false);
+        assert_eq!(eval_formula("1011||=!"), !true);
+        assert_eq!(eval_formula("0!!"), !true);
+        assert_eq!(eval_formula("1!!"), !false);
+    }
+
+    #[test]
+    #[should_panic(expected = "formula string is empty")]
+    fn bool_eval_empty_string() {
+        eval_formula("");
+    }
+
+    #[test]
+    #[should_panic(expected = "'x' is not a valid op or is missing an argument")]
+    fn bool_eval_invalid_characters() {
+        eval_formula("10&!xslkfj");
+    }
+
+    #[test]
+    #[should_panic(expected = "'!' is not a valid op or is missing an argument")]
+    fn bool_eval_no_argument_for_negate_op() {
+        eval_formula("!");
+    }
+
+    #[test]
+    #[should_panic(expected = "'&' is not a valid op or is missing an argument")]
+    fn bool_eval_only_one_argument_for_and_op() {
+        eval_formula("1&");
+    }
 }
