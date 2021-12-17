@@ -174,4 +174,14 @@ mod tests {
     fn bool_eval_only_one_argument_for_and_op() {
         eval_formula("1&");
     }
+
+    #[test]
+    fn bool_eval_unused_leading_zeroes() {
+        assert_eq!(eval_formula("000001"), true);
+    }
+
+    #[test]
+    fn bool_eval_unused_leading_ones() {
+        assert_eq!(eval_formula("111110"), false);
+    }
 }
