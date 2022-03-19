@@ -62,7 +62,7 @@ pub fn eval_formula(formula: &str) -> bool {
     stack.pop().expect("nothing to return (stack is empty)")
 }
 
-fn print_tt(varmap: &HashMap<char, bool>, keys: &Vec<char>, is_header: bool) {
+fn print_truth(varmap: &HashMap<char, bool>, keys: &Vec<char>, is_header: bool) {
     let mut line: String = String::with_capacity(27*4+1);
 
     for key in keys.iter() {
@@ -79,9 +79,8 @@ fn print_tt(varmap: &HashMap<char, bool>, keys: &Vec<char>, is_header: bool) {
     }
 }
 
-fn find_truth(formula: &str, varmap: &mut HashMap<char, bool>, keys: &Vec<char>) {
+fn find_truth(formula: &str, varmap: &mut HashMap<char, bool>) {
     let mut compiled_formula: String = String::with_capacity(formula.len());
-    let mut last_zero: Option<char> = None;
 
     for c in formula.chars() {
         let op = match c {
@@ -91,12 +90,21 @@ fn find_truth(formula: &str, varmap: &mut HashMap<char, bool>, keys: &Vec<char>)
         compiled_formula.push(op);
     }
     varmap.insert('=', eval_formula(&compiled_formula));
-    print_tt(&varmap, &keys, false);
+}
+
+fn set_values(varmap: &mut HashMap<char, bool>, keys: &Vec<char>, values: u32) {
+    let length: usize = keys.len() - 1;
+    if values == 0 { return }
+    for shift in 0..length {
+        let value = (values >> shift) & 1 != 0;
+        varmap.insert(keys[length - shift - 1], value);
+    }
 }
 
 pub fn print_truth_table(formula: &str) {
     let mut varmap: HashMap<char, bool> = HashMap::with_capacity(27);
     let mut keys: Vec<char> = Vec::with_capacity(27);
+    let mut values: u32 = 0;
 
     for c in formula.chars() {
         match c {
@@ -107,10 +115,17 @@ pub fn print_truth_table(formula: &str) {
             _ => (),
         }
     }
+    let values_max: u32 = 1 << keys.len();
     varmap.insert('=', false);
     keys.push('=');
     keys.sort();
     keys.rotate_left(1);
-    print_tt(&varmap, &keys, true);
-    find_truth(formula, &mut varmap, &keys);
+    print_truth(&varmap, &keys, true);
+    loop {
+        set_values(&mut varmap, &keys, values);
+        find_truth(formula, &mut varmap);
+        print_truth(&varmap, &keys, false);
+        values = values + 1;
+        if values == values_max { break; }
+    }
 }

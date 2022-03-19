@@ -8,6 +8,8 @@ fn main() {
     gray_code_diff(1234);
     eval_formula("10&");
     print_truth_table("AB&");
+    println!("");
+    print_truth_table("AB&C|");
     //print_truth_table("");
 }
 
