@@ -10,7 +10,14 @@ fn main() {
     print_truth_table("AB&");
     println!("");
     print_truth_table("AB&C|");
-    //print_truth_table("");
+    println!("");
+    print_truth_table("A");
+    println!("");
+    print_truth_table("Z!");
+    println!("");
+    print_truth_table("CZ&Z|!");
+    println!("");
+    print_truth_table("ABCDEFGH||=&&||!");
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -190,5 +197,17 @@ mod tests {
     #[should_panic(expected = "the stack should be empty at the end")]
     fn bool_eval_unused_leading_ones() {
         assert_eq!(eval_formula("111110"), false);
+    }
+
+    #[test]
+    #[should_panic(expected = "formula string is empty")]
+    fn truth_table_empty_string() {
+        print_truth_table("");
+    }
+
+    #[test]
+    #[should_panic(expected = "'1' is not a valid op")]
+    fn truth_table_boolean_value() {
+        print_truth_table("100&Z!");
     }
 }
