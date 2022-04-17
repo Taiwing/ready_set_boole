@@ -1,6 +1,7 @@
 use std::convert::TryInto;
 use std::collections::HashMap;
 use std::io::{self, Write, BufWriter};
+use std::fmt;
 
 pub fn adder(mut a: u32, mut b: u32) -> u32 {
     let mut newbit: u32;
@@ -146,8 +147,80 @@ pub fn print_truth_table(formula: &str) {
 	truth_table(formula, Some(&mut writer));
 }
 
-/*
+#[derive(Debug)]
+enum BooleanAstType {
+	Variable,
+	Negation,
+	Conjunction,
+	Disjunction,
+	ExclusiveDisjunction,
+	MaterialCondition,
+	LogicalEquivalence,
+}
+
+impl fmt::Display for BooleanAstType {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{:?}", self)
+	}
+}
+
+struct BooleanAstNode {
+	boolean_type: BooleanAstType,
+	left: Option<Box<BooleanAstNode>>,
+	right: Option<Box<BooleanAstNode>>,
+}
+
+impl BooleanAstNode {
+	fn new(c: char) -> BooleanAstNode {
+		let boolean_type = match c {
+			'A' ..='Z' => BooleanAstType::Variable,
+			'!' => BooleanAstType::Negation,
+			'&' => BooleanAstType::Conjunction,
+			'|' => BooleanAstType::Disjunction,
+			'^' => BooleanAstType::ExclusiveDisjunction,
+			'>' => BooleanAstType::MaterialCondition,
+			'=' => BooleanAstType::LogicalEquivalence,
+			_ => panic!("'{}' is not a valid op", c),
+		};
+		BooleanAstNode { boolean_type, left: None, right: None }
+	}
+
+	fn init_child<T: Iterator<Item = char>>(&mut self, formula: &mut T) -> Box<BooleanAstNode> {
+		if let Some(op) = formula.next() {
+			let mut child = Box::new(BooleanAstNode::new(op));
+			child.init_children(formula);
+			child
+		} else {
+			panic!("missing operand for operator '{}'",
+				self.boolean_type.to_string());
+		}
+	}
+
+	fn init_children<T: Iterator<Item = char>>(&mut self, formula: &mut T) {
+		match self.boolean_type {
+			BooleanAstType::Variable => (),
+			BooleanAstType::Negation => {
+				self.left = Some(self.init_child(formula));
+			},
+			_ => {
+				self.left = Some(self.init_child(formula));
+				self.right = Some(self.init_child(formula));
+			},
+		}
+	}
+
+	fn build_ast_tree(formula: &str) -> BooleanAstNode {
+		let mut iter = formula.chars().rev();
+		let mut ast = if let Some(op) = iter.next() {
+			BooleanAstNode::new(op)
+		} else {
+			panic!("formula string is empty");
+		};
+		ast.init_children(&mut iter);
+		ast
+	}
+}
+
 pub fn negation_normal_form(formula: &str) -> String {
 	String::new()
 }
-*/

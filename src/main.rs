@@ -232,7 +232,6 @@ mod tests {
         truth_table::<std::io::Stdout>("100&Z!", None);
     }
 
-	/*
 	#[test]
 	fn nnf_subject_tests() {
 		assert_eq!("A!B!|", negation_normal_form("AB&!"));
@@ -241,5 +240,4 @@ mod tests {
 		assert_eq!("AB&A!B!&|", negation_normal_form("AB="));
 		assert_eq!("A!B!&C!|", negation_normal_form("AB|C&!"));
 	}
-	*/
 }
