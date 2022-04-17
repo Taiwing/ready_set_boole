@@ -164,10 +164,16 @@ impl fmt::Display for BooleanAstType {
 	}
 }
 
-struct BooleanAstNode {
+pub struct BooleanAstNode {
 	boolean_type: BooleanAstType,
 	left: Option<Box<BooleanAstNode>>,
 	right: Option<Box<BooleanAstNode>>,
+}
+
+impl fmt::Display for BooleanAstNode {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{}", self.ast_string())
+	}
 }
 
 impl BooleanAstNode {
@@ -209,7 +215,7 @@ impl BooleanAstNode {
 		}
 	}
 
-	fn build_ast_tree(formula: &str) -> BooleanAstNode {
+	pub fn build_ast_tree(formula: &str) -> BooleanAstNode {
 		let mut iter = formula.chars().rev();
 		let mut ast = if let Some(op) = iter.next() {
 			BooleanAstNode::new(op)
@@ -218,6 +224,49 @@ impl BooleanAstNode {
 		};
 		ast.init_children(&mut iter);
 		ast
+	}
+
+	fn has_left(&self) -> bool {
+		match self.left {
+			Some(_) => true,
+			_ => false,
+		}
+	}
+
+	fn has_right(&self) -> bool {
+		match self.right {
+			Some(_) => true,
+			_ => false,
+		}
+	}
+
+	fn node_string(mut tree: &mut String,
+		node_opt: &Option<Box<BooleanAstNode>>, mut padding: String,
+		pointer: &str, has_left_sibling: bool) {
+		if let Some(node) = node_opt {
+			tree.push_str(&format!("\n{}{}{}",
+				padding, pointer, node.boolean_type.to_string()));
+			padding.push_str(if has_left_sibling { "│  " } else { "   " });
+			let pointer_left = "└──";
+			let pointer_right = if node.has_left() { "├──" } else { "└──" };
+			BooleanAstNode::node_string(&mut tree, &node.right, padding.clone(),
+				pointer_right, node.has_left());
+			BooleanAstNode::node_string(&mut tree, &node.left, padding,
+				pointer_left, false);
+		}
+	}
+
+	fn ast_string(&self) -> String {
+		let mut tree = String::new();
+		let pointer_left = "└──";
+		let pointer_right = if self.has_left() { "├──" } else { "└──" };
+
+		tree.push_str(&self.boolean_type.to_string());
+		BooleanAstNode::node_string(&mut tree, &self.right, String::new(),
+			pointer_right, self.has_left());
+		BooleanAstNode::node_string(&mut tree, &self.left, String::new(),
+			pointer_left, false);
+		tree
 	}
 }
 
