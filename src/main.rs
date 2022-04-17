@@ -33,6 +33,15 @@ fn main() {
 	ast = BooleanAstNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
+	formula = "ABCDEFGHI>^|=&&||!";
+	ast = BooleanAstNode::tree(formula);
+    println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
+		formula, ast.to_formula(), ast);
+	ast.pre_order_traversal(BooleanAstNode::replace_exclusive_disjunction);
+    println!("after XOR replacement:\t'{}'\n{}\n", ast.to_formula(), ast);
+	formula = "PQ^A|";
+	let expected = "PQ|PQ&!&A|";
+	truth_diff(formula, expected);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -55,6 +64,18 @@ fn gray_code_diff(n: u32) {
     println!("gray_code({} [{:#b}])): mine = {} [{:#b}], orig = {} [{:#b}]",
         n, n, mine, mine, orig, orig);
     assert_eq!(mine, orig);
+}
+
+fn truth_diff(left: &str, right: &str) {
+	match (truth_table::<std::io::Stdout>(left, None),
+		truth_table::<std::io::Stdout>(right, None)) {
+		(Some(left_truth), Some(right_truth)) => {
+			println!("left:\t\t'{}'\n{}", left, left_truth);
+			println!("right:\t'{}'\n{}", right, right_truth);
+			assert_eq!(left_truth, right_truth);
+		},
+		_ => panic!("missing truth"),
+	}
 }
 
 #[cfg(test)]
@@ -252,24 +273,31 @@ mod tests {
 		let mut formula = "A";
 		let mut ast = BooleanAstNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
+
 		formula = "AB|";
 		ast = BooleanAstNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
+
 		formula = "AB&C|";
 		ast = BooleanAstNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
+
 		formula = "ABC&|";
 		ast = BooleanAstNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
+
 		formula = "AB=";
 		ast = BooleanAstNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
+
 		formula = "AB=!";
 		ast = BooleanAstNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
+
 		formula = "ABCDEFGH||=&&||!";
 		ast = BooleanAstNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
+
 		formula = "ABCDEFGHI>^|=&&||!";
 		ast = BooleanAstNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
@@ -296,13 +324,18 @@ mod tests {
 	#[test]
 	fn bool_ast_replace_exclusive_disjunction() {
 		let mut formula = "PQ^";
+		let mut expected = "PQ|PQ&!&";
 		let mut ast = BooleanAstNode::tree(formula);
-		ast.replace_exclusive_disjunction();
-		assert_eq!(ast.to_formula(), "PQ|PQ&!&");
+		ast.pre_order_traversal(BooleanAstNode::replace_exclusive_disjunction);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
 		formula = "PQ^A|";
+		expected = "PQ|PQ&!&A|";
 		ast = BooleanAstNode::tree(formula);
 		ast.pre_order_traversal(BooleanAstNode::replace_exclusive_disjunction);
-		assert_eq!(ast.to_formula(), "PQ|PQ&!&A|");
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
 	}
 
 	/*
