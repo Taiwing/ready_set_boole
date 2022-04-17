@@ -245,13 +245,13 @@ impl BooleanAstNode {
 		ast
 	}
 
-	pub fn pre_order_traversal(&mut self, op: BooleanNodeOp) {
+	pub fn pre_order(&mut self, op: BooleanNodeOp) {
 		op(self);
 		if let Some(left_node) = &mut self.left {
-			left_node.pre_order_traversal(op);
+			left_node.pre_order(op);
 		}
 		if let Some(right_node) = &mut self.right {
-			right_node.pre_order_traversal(op);
+			right_node.pre_order(op);
 		}
 	}
 

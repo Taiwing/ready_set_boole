@@ -37,7 +37,7 @@ fn main() {
 	ast = BooleanAstNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
-	ast.pre_order_traversal(BooleanAstNode::replace_exclusive_disjunction);
+	ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
     println!("after XOR replacement:\t'{}'\n{}\n", ast.to_formula(), ast);
 	formula = "PQ^A|";
 	let expected = "PQ|PQ&!&A|";
@@ -326,14 +326,14 @@ mod tests {
 		let mut formula = "PQ^";
 		let mut expected = "PQ|PQ&!&";
 		let mut ast = BooleanAstNode::tree(formula);
-		ast.pre_order_traversal(BooleanAstNode::replace_exclusive_disjunction);
+		ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "PQ^A|";
 		expected = "PQ|PQ&!&A|";
 		ast = BooleanAstNode::tree(formula);
-		ast.pre_order_traversal(BooleanAstNode::replace_exclusive_disjunction);
+		ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 	}
