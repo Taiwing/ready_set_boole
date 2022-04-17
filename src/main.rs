@@ -295,10 +295,14 @@ mod tests {
 
 	#[test]
 	fn bool_ast_replace_exclusive_disjunction() {
-		let formula = "PQ^";
+		let mut formula = "PQ^";
 		let mut ast = BooleanAstNode::tree(formula);
 		ast.replace_exclusive_disjunction();
 		assert_eq!(ast.to_formula(), "PQ|PQ&!&");
+		formula = "PQ^A|";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order_traversal(BooleanAstNode::replace_exclusive_disjunction);
+		assert_eq!(ast.to_formula(), "PQ|PQ&!&A|");
 	}
 
 	/*

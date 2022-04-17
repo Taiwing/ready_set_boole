@@ -190,6 +190,8 @@ impl Clone for BooleanAstNode {
 	}
 }
 
+type BooleanNodeOp = fn (&mut BooleanAstNode);
+
 impl BooleanAstNode {
 	fn new(c: char) -> BooleanAstNode {
 		let boolean_type = match c {
@@ -241,6 +243,16 @@ impl BooleanAstNode {
 			panic!("unused operands in formula string");
 		}
 		ast
+	}
+
+	pub fn pre_order_traversal(&mut self, op: BooleanNodeOp) {
+		op(self);
+		if let Some(left_node) = &mut self.left {
+			left_node.pre_order_traversal(op);
+		}
+		if let Some(right_node) = &mut self.right {
+			right_node.pre_order_traversal(op);
+		}
 	}
 
 	pub fn replace_exclusive_disjunction(&mut self) {
