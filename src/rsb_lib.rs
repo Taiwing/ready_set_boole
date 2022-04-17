@@ -1,5 +1,6 @@
 use std::convert::TryInto;
 use std::collections::HashMap;
+use std::io::{self, Write, BufWriter};
 
 pub fn adder(mut a: u32, mut b: u32) -> u32 {
     let mut newbit: u32;
@@ -62,21 +63,28 @@ pub fn eval_formula(formula: &str) -> bool {
     stack.pop().expect("nothing to return (stack is empty)")
 }
 
-fn print_truth(varmap: &HashMap<char, bool>, keys: &Vec<char>, is_header: bool) {
-    let mut line: String = String::with_capacity(27*4+1);
+fn write_truth<W: Write>(table: &mut String, writer: &mut Option<&mut BufWriter<W>>, truth: String) {
+	if let Some(w) = writer {
+		w.write(truth.as_bytes()).unwrap();
+	} else {
+		table.push_str(&truth)
+	};
+}
+
+fn build_truth(varmap: &HashMap<char, bool>, keys: &Vec<char>, is_header: bool) -> String {
+	let mut truth: String = String::with_capacity((27*4+1)*2);
 
     for key in keys.iter() {
         let value = *varmap.get(key).unwrap();
         let c = if is_header { *key } else if value { '1' } else { '0' };
-        line.push_str(&format!("| {} ", c));
+        truth.push_str(&format!("| {} ", c));
     }
-    line.push('|');
-    println!("{}", line);
+    truth.push_str("|");
     if is_header {
-        let sep: String = line.chars()
+        let sep: String = truth.clone().chars()
             .map(|x| if x == '|' { '|' } else { '-' }).collect();
-        println!("{}", sep);
-    }
+		format!("{}\n{}\n", truth, sep)
+    } else { format!("{}\n", truth) }
 }
 
 fn find_truth(formula: &str, varmap: &mut HashMap<char, bool>) {
@@ -101,9 +109,10 @@ fn set_values(varmap: &mut HashMap<char, bool>, keys: &Vec<char>, values: u32) {
     }
 }
 
-pub fn print_truth_table(formula: &str) {
+pub fn truth_table<W: Write>(formula: &str, mut writer: Option<&mut BufWriter<W>>) -> Option<String> {
     let mut varmap: HashMap<char, bool> = HashMap::with_capacity(27);
     let mut keys: Vec<char> = Vec::with_capacity(27);
+	let mut table: String = String::new();
     let mut values: u32 = 0;
 
     for c in formula.chars() {
@@ -120,12 +129,25 @@ pub fn print_truth_table(formula: &str) {
     keys.push('=');
     keys.sort();
     keys.rotate_left(1);
-    print_truth(&varmap, &keys, true);
+    write_truth(&mut table, &mut writer, build_truth(&varmap, &keys, true));
     loop {
         set_values(&mut varmap, &keys, values);
         find_truth(formula, &mut varmap);
-        print_truth(&varmap, &keys, false);
+        let truth = build_truth(&varmap, &keys, false);
+		write_truth(&mut table, &mut writer, truth);
         values = values + 1;
         if values == values_max { break; }
-    }
+    };
+	Some(table)
 }
+
+pub fn print_truth_table(formula: &str) {
+	let mut writer = BufWriter::new(io::stdout());
+	truth_table(formula, Some(&mut writer));
+}
+
+/*
+pub fn negation_normal_form(formula: &str) -> String {
+	String::new()
+}
+*/

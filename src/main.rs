@@ -199,15 +199,47 @@ mod tests {
         assert_eq!(eval_formula("111110"), false);
     }
 
+	#[test]
+	fn truth_table_subject_tests() {
+		let expected: &str = "\
+			| A | B | C | = |\n\
+			|---|---|---|---|\n\
+			| 0 | 0 | 0 | 0 |\n\
+			| 0 | 0 | 1 | 1 |\n\
+			| 0 | 1 | 0 | 0 |\n\
+			| 0 | 1 | 1 | 1 |\n\
+			| 1 | 0 | 0 | 0 |\n\
+			| 1 | 0 | 1 | 1 |\n\
+			| 1 | 1 | 0 | 1 |\n\
+			| 1 | 1 | 1 | 1 |\n\
+		";
+		if let Some(truth) = truth_table::<std::io::Stdout>("AB&C|", None) {
+			assert_eq!(truth, expected);
+		} else {
+			panic!("no output string for truth_table function");
+		}
+	}
+
     #[test]
     #[should_panic(expected = "formula string is empty")]
     fn truth_table_empty_string() {
-        print_truth_table("");
+        truth_table::<std::io::Stdout>("", None);
     }
 
     #[test]
     #[should_panic(expected = "'1' is not a valid op")]
     fn truth_table_boolean_value() {
-        print_truth_table("100&Z!");
+        truth_table::<std::io::Stdout>("100&Z!", None);
     }
+
+	/*
+	#[test]
+	fn nnf_subject_tests() {
+		assert_eq!("A!B!|", negation_normal_form("AB&!"));
+		assert_eq!("A!B!&", negation_normal_form("AB|!"));
+		assert_eq!("A!B|", negation_normal_form("AB>"));
+		assert_eq!("AB&A!B!&|", negation_normal_form("AB="));
+		assert_eq!("A!B!&C!|", negation_normal_form("AB|C&!"));
+	}
+	*/
 }
