@@ -17,28 +17,34 @@ fn main() {
     println!("");
     print_truth_table("CZ&Z|!");
     println!("");
+
 	let mut formula = "AB&C|";
 	let mut ast = BooleanAstNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
+
 	formula = "ABC&|";
 	ast = BooleanAstNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
+
 	formula = "CZ&Z|!";
 	ast = BooleanAstNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
+
 	formula = "ABCDEFGH||=&&||!";
 	ast = BooleanAstNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
+
 	formula = "ABCDEFGHI>^|=&&||!";
 	ast = BooleanAstNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
 	ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
     println!("after XOR replacement:\t'{}'\n{}\n", ast.to_formula(), ast);
+
 	formula = "PQ^A|";
 	let expected = "PQ|PQ&!&A|";
 	truth_diff(formula, expected);
@@ -336,6 +342,16 @@ mod tests {
 		ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
+
+		formula = "ABCDEFGHI>^|=^^||!";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
+		truth_diff(formula, &ast.to_formula());
+
+		formula = "ABCDEFGHI>^^=^^^^!";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
+		truth_diff(formula, &ast.to_formula());
 	}
 
 	/*
