@@ -173,7 +173,20 @@ pub struct BooleanAstNode {
 
 impl fmt::Display for BooleanAstNode {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f, "{}", self.ast_string())
+		write!(f, "{}", self.tree_string())
+	}
+}
+
+impl Clone for BooleanAstNode {
+	fn clone(&self) -> Self {
+		let mut ast = BooleanAstNode::new(self.op_symbol);
+		if let Some(left_node) = &self.left {
+			ast.left = Some(Box::new(*left_node.clone()));
+		}
+		if let Some(right_node) = &self.right {
+			ast.right = Some(Box::new(*right_node.clone()));
+		}
+		ast
 	}
 }
 
@@ -216,7 +229,7 @@ impl BooleanAstNode {
 		}
 	}
 
-	pub fn build_ast_tree(formula: &str) -> BooleanAstNode {
+	pub fn tree(formula: &str) -> BooleanAstNode {
 		let mut iter = formula.chars().rev();
 		let mut ast = if let Some(op) = iter.next() {
 			BooleanAstNode::new(op)
@@ -228,6 +241,26 @@ impl BooleanAstNode {
 			panic!("unused operands in formula string");
 		}
 		ast
+	}
+
+	pub fn replace_exclusive_disjunction(&mut self) {
+		if self.boolean_type != BooleanAstType::ExclusiveDisjunction { return };
+		match (&self.left, &self.right) {
+			(Some(_), Some(_)) => {
+				let mut new_left = Box::new(self.clone());
+				new_left.boolean_type = BooleanAstType::Disjunction;
+				new_left.op_symbol = '&';
+				let mut new_right = Box::new(BooleanAstNode::new('!'));
+				let mut copy = Box::new(self.clone());
+				copy.boolean_type = BooleanAstType::Conjunction;
+				copy.op_symbol = '&';
+				new_right.left = Some(copy);
+				self.left = Some(new_left);
+				self.right = Some(new_right);
+			},
+			_ => panic!("missing operand on {} node",
+				self.boolean_type.to_string()),
+		}
 	}
 
 	fn has_left(&self) -> bool {
@@ -263,7 +296,7 @@ impl BooleanAstNode {
 		}
 	}
 
-	fn ast_string(&self) -> String {
+	fn tree_string(&self) -> String {
 		let mut tree = String::new();
 		let pointer_left = "└──";
 		let pointer_right = if self.has_left() { "├──" } else { "└──" };
@@ -277,6 +310,17 @@ impl BooleanAstNode {
 		BooleanAstNode::node_string(&mut tree, &self.left, String::new(),
 			pointer_left, false);
 		tree
+	}
+
+	pub fn to_formula(&self) -> String {
+		let mut formula = String::new();
+		fn add_node(node: &BooleanAstNode, formula: &mut String) {
+			if let Some(left) = &node.left { add_node(left, formula); }
+			if let Some(right) = &node.right { add_node(right, formula); }
+			formula.push(node.op_symbol);
+		}
+		add_node(self, &mut formula);
+		formula
 	}
 }
 

@@ -19,12 +19,18 @@ fn main() {
     println!("");
     print_truth_table("ABCDEFGH||=&&||!");
     println!("");
-	let mut formula = "ABCDEFGH||=&&||!";
-    println!("'{}'\n{}\n", formula, BooleanAstNode::build_ast_tree(formula));
+	let mut formula = "AB&C|";
+	let mut ast = BooleanAstNode::tree(formula);
+    println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
+		formula, ast.to_formula(), ast);
 	formula = "CZ&Z|!";
-    println!("'{}'\n{}\n", formula, BooleanAstNode::build_ast_tree(formula));
-	formula = "AB&C|";
-    println!("'{}'\n{}\n", formula, BooleanAstNode::build_ast_tree(formula));
+	ast = BooleanAstNode::tree(formula);
+    println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
+		formula, ast.to_formula(), ast);
+	formula = "ABCDEFGH||=&&||!";
+	ast = BooleanAstNode::tree(formula);
+    println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
+		formula, ast.to_formula(), ast);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -240,6 +246,42 @@ mod tests {
     }
 
 	#[test]
+	fn bool_ast_tree_basics() {
+		let mut formula = "A";
+		let mut ast = BooleanAstNode::tree(formula);
+		assert_eq!(formula, &ast.to_formula());
+		formula = "AB|";
+		ast = BooleanAstNode::tree(formula);
+		assert_eq!(formula, &ast.to_formula());
+		formula = "AB&C|";
+		ast = BooleanAstNode::tree(formula);
+		assert_eq!(formula, &ast.to_formula());
+		formula = "AB=";
+		ast = BooleanAstNode::tree(formula);
+		assert_eq!(formula, &ast.to_formula());
+		formula = "AB=!";
+		ast = BooleanAstNode::tree(formula);
+		assert_eq!(formula, &ast.to_formula());
+		formula = "ABCDEFGH||=&&||!";
+		ast = BooleanAstNode::tree(formula);
+		assert_eq!(formula, &ast.to_formula());
+		formula = "ABCDEFGHI>^|=&&||!";
+		ast = BooleanAstNode::tree(formula);
+		assert_eq!(formula, &ast.to_formula());
+	}
+
+	/*
+	#[test]
+	fn bool_ast_replace_exclusive_disjunction() {
+		let formula = "PQ^";
+		let ast = BooleanAstNode::tree(formula);
+		ast.replace_exclusive_disjunction();
+		assert_eq!(ast.to_formula(), "PQ|PQ&!&");
+	}
+	*/
+
+	/*
+	#[test]
 	fn nnf_subject_tests() {
 		assert_eq!("A!B!|", negation_normal_form("AB&!"));
 		assert_eq!("A!B!&", negation_normal_form("AB|!"));
@@ -247,4 +289,5 @@ mod tests {
 		assert_eq!("AB&A!B!&|", negation_normal_form("AB="));
 		assert_eq!("A!B!&C!|", negation_normal_form("AB|C&!"));
 	}
+	*/
 }
