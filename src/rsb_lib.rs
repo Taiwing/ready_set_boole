@@ -147,7 +147,7 @@ pub fn print_truth_table(formula: &str) {
 	truth_table(formula, Some(&mut writer));
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum BooleanAstType {
 	Variable,
 	Negation,
@@ -166,6 +166,7 @@ impl fmt::Display for BooleanAstType {
 
 pub struct BooleanAstNode {
 	boolean_type: BooleanAstType,
+	op_symbol: char,
 	left: Option<Box<BooleanAstNode>>,
 	right: Option<Box<BooleanAstNode>>,
 }
@@ -188,7 +189,7 @@ impl BooleanAstNode {
 			'=' => BooleanAstType::LogicalEquivalence,
 			_ => panic!("'{}' is not a valid op", c),
 		};
-		BooleanAstNode { boolean_type, left: None, right: None }
+		BooleanAstNode { boolean_type, op_symbol: c, left: None, right: None }
 	}
 
 	fn init_child<T: Iterator<Item = char>>(&mut self, formula: &mut T) -> Box<BooleanAstNode> {
@@ -223,6 +224,9 @@ impl BooleanAstNode {
 			panic!("formula string is empty");
 		};
 		ast.init_children(&mut iter);
+		if let Some(_) = iter.next() {
+			panic!("unused operands in formula string");
+		}
 		ast
 	}
 
@@ -246,6 +250,9 @@ impl BooleanAstNode {
 		if let Some(node) = node_opt {
 			tree.push_str(&format!("\n{}{}{}",
 				padding, pointer, node.boolean_type.to_string()));
+			if node.boolean_type == BooleanAstType::Variable {
+				tree.push_str(&format!("({})", node.op_symbol));
+			}
 			padding.push_str(if has_left_sibling { "│  " } else { "   " });
 			let pointer_left = "└──";
 			let pointer_right = if node.has_left() { "├──" } else { "└──" };
@@ -262,6 +269,9 @@ impl BooleanAstNode {
 		let pointer_right = if self.has_left() { "├──" } else { "└──" };
 
 		tree.push_str(&self.boolean_type.to_string());
+		if self.boolean_type == BooleanAstType::Variable {
+			tree.push_str(&format!("({})", self.op_symbol));
+		}
 		BooleanAstNode::node_string(&mut tree, &self.right, String::new(),
 			pointer_right, self.has_left());
 		BooleanAstNode::node_string(&mut tree, &self.left, String::new(),

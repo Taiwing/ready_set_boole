@@ -18,8 +18,13 @@ fn main() {
     print_truth_table("CZ&Z|!");
     println!("");
     print_truth_table("ABCDEFGH||=&&||!");
-    println!("{}", BooleanAstNode::build_ast_tree("ABCDEFGH||=&&||!"));
-    println!("{}", BooleanAstNode::build_ast_tree("CZ&Z|!"));
+    println!("");
+	let mut formula = "ABCDEFGH||=&&||!";
+    println!("'{}'\n{}\n", formula, BooleanAstNode::build_ast_tree(formula));
+	formula = "CZ&Z|!";
+    println!("'{}'\n{}\n", formula, BooleanAstNode::build_ast_tree(formula));
+	formula = "AB&C|";
+    println!("'{}'\n{}\n", formula, BooleanAstNode::build_ast_tree(formula));
 }
 
 fn adder_diff(left: u32, right: u32) {
