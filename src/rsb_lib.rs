@@ -210,8 +210,8 @@ impl BooleanAstNode {
 				self.left = Some(self.init_child(formula));
 			},
 			_ => {
-				self.left = Some(self.init_child(formula));
 				self.right = Some(self.init_child(formula));
+				self.left = Some(self.init_child(formula));
 			},
 		}
 	}
