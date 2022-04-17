@@ -211,7 +211,7 @@ impl BooleanAstNode {
 			child.init_children(formula);
 			child
 		} else {
-			panic!("missing operand for operator '{}'",
+			panic!("missing operand for '{}' operation",
 				self.boolean_type.to_string());
 		}
 	}
@@ -249,17 +249,21 @@ impl BooleanAstNode {
 			(Some(_), Some(_)) => {
 				let mut new_left = Box::new(self.clone());
 				new_left.boolean_type = BooleanAstType::Disjunction;
-				new_left.op_symbol = '&';
+				new_left.op_symbol = '|';
 				let mut new_right = Box::new(BooleanAstNode::new('!'));
 				let mut copy = Box::new(self.clone());
 				copy.boolean_type = BooleanAstType::Conjunction;
 				copy.op_symbol = '&';
 				new_right.left = Some(copy);
+				self.boolean_type = BooleanAstType::Conjunction;
+				self.op_symbol = '&';
 				self.left = Some(new_left);
 				self.right = Some(new_right);
 			},
-			_ => panic!("missing operand on {} node",
-				self.boolean_type.to_string()),
+			_ => {
+				panic!("missing operand for '{}' operation",
+					self.boolean_type.to_string());
+			},
 		}
 	}
 

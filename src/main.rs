@@ -17,10 +17,12 @@ fn main() {
     println!("");
     print_truth_table("CZ&Z|!");
     println!("");
-    print_truth_table("ABCDEFGH||=&&||!");
-    println!("");
 	let mut formula = "AB&C|";
 	let mut ast = BooleanAstNode::tree(formula);
+    println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
+		formula, ast.to_formula(), ast);
+	formula = "ABC&|";
+	ast = BooleanAstNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
 	formula = "CZ&Z|!";
@@ -256,6 +258,9 @@ mod tests {
 		formula = "AB&C|";
 		ast = BooleanAstNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
+		formula = "ABC&|";
+		ast = BooleanAstNode::tree(formula);
+		assert_eq!(formula, &ast.to_formula());
 		formula = "AB=";
 		ast = BooleanAstNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
@@ -270,15 +275,31 @@ mod tests {
 		assert_eq!(formula, &ast.to_formula());
 	}
 
-	/*
+	#[test]
+    #[should_panic(expected = "formula string is empty")]
+	fn bool_ast_tree_empty_string() {
+		BooleanAstNode::tree("");
+	}
+
+	#[test]
+    #[should_panic(expected = "unused operands in formula string")]
+	fn bool_ast_tree_unused_operands() {
+		BooleanAstNode::tree("ABC|");
+	}
+
+	#[test]
+    #[should_panic(expected = "missing operand for 'Negation' operation")]
+	fn bool_ast_tree_missing_operand() {
+		BooleanAstNode::tree("!");
+	}
+
 	#[test]
 	fn bool_ast_replace_exclusive_disjunction() {
 		let formula = "PQ^";
-		let ast = BooleanAstNode::tree(formula);
+		let mut ast = BooleanAstNode::tree(formula);
 		ast.replace_exclusive_disjunction();
 		assert_eq!(ast.to_formula(), "PQ|PQ&!&");
 	}
-	*/
 
 	/*
 	#[test]
