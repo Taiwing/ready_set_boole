@@ -147,7 +147,7 @@ pub fn print_truth_table(formula: &str) {
 	truth_table(formula, Some(&mut writer));
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 enum BooleanAstType {
 	Variable,
 	Negation,
@@ -167,8 +167,8 @@ impl fmt::Display for BooleanAstType {
 pub struct BooleanAstNode {
 	boolean_type: BooleanAstType,
 	op_symbol: char,
-	left: Option<Box<BooleanAstNode>>,
-	right: Option<Box<BooleanAstNode>>,
+	left: Option<Box<Self>>,
+	right: Option<Box<Self>>,
 }
 
 impl fmt::Display for BooleanAstNode {
@@ -179,7 +179,7 @@ impl fmt::Display for BooleanAstNode {
 
 impl Clone for BooleanAstNode {
 	fn clone(&self) -> Self {
-		let mut ast = BooleanAstNode::new(self.op_symbol);
+		let mut ast = Self::new(self.op_symbol);
 		if let Some(left_node) = &self.left {
 			ast.left = Some(Box::new(*left_node.clone()));
 		}
@@ -193,8 +193,8 @@ impl Clone for BooleanAstNode {
 type BooleanNodeOp = fn (&mut BooleanAstNode);
 
 impl BooleanAstNode {
-	fn new(c: char) -> BooleanAstNode {
-		let boolean_type = match c {
+	fn symbol_to_type(c: char) -> BooleanAstType {
+		match c {
 			'A' ..='Z' => BooleanAstType::Variable,
 			'!' => BooleanAstType::Negation,
 			'&' => BooleanAstType::Conjunction,
@@ -203,13 +203,36 @@ impl BooleanAstNode {
 			'>' => BooleanAstType::MaterialCondition,
 			'=' => BooleanAstType::LogicalEquivalence,
 			_ => panic!("'{}' is not a valid op", c),
-		};
-		BooleanAstNode { boolean_type, op_symbol: c, left: None, right: None }
+		}
 	}
 
-	fn init_child<T: Iterator<Item = char>>(&mut self, formula: &mut T) -> Box<BooleanAstNode> {
+	fn type_to_symbol(boolean_type: BooleanAstType) -> char {
+		match boolean_type {
+			BooleanAstType::Negation => '!',
+			BooleanAstType::Conjunction => '&',
+			BooleanAstType::Disjunction => '|',
+			BooleanAstType::ExclusiveDisjunction => '^',
+			BooleanAstType::MaterialCondition => '>',
+			BooleanAstType::LogicalEquivalence => '=',
+			BooleanAstType::Variable => {
+				panic!("no predefined symbol for '{}' type", boolean_type);
+			},
+		}
+	}
+
+	fn change_type(&mut self, new_type: BooleanAstType) {
+		self.boolean_type = new_type;
+		self.op_symbol = Self::type_to_symbol(new_type);
+	}
+
+	fn new(c: char) -> Self {
+		let boolean_type = Self::symbol_to_type(c);
+		Self { boolean_type, op_symbol: c, left: None, right: None }
+	}
+
+	fn init_child<T: Iterator<Item = char>>(&mut self, formula: &mut T) -> Box<Self> {
 		if let Some(op) = formula.next() {
-			let mut child = Box::new(BooleanAstNode::new(op));
+			let mut child = Box::new(Self::new(op));
 			child.init_children(formula);
 			child
 		} else {
@@ -231,10 +254,10 @@ impl BooleanAstNode {
 		}
 	}
 
-	pub fn tree(formula: &str) -> BooleanAstNode {
+	pub fn tree(formula: &str) -> Self {
 		let mut iter = formula.chars().rev();
 		let mut ast = if let Some(op) = iter.next() {
-			BooleanAstNode::new(op)
+			Self::new(op)
 		} else {
 			panic!("formula string is empty");
 		};
@@ -260,15 +283,12 @@ impl BooleanAstNode {
 		match (&self.left, &self.right) {
 			(Some(_), Some(_)) => {
 				let mut new_left = Box::new(self.clone());
-				new_left.boolean_type = BooleanAstType::Disjunction;
-				new_left.op_symbol = '|';
-				let mut new_right = Box::new(BooleanAstNode::new('!'));
+				new_left.change_type(BooleanAstType::Disjunction);
+				let mut new_right = Box::new(Self::new('!'));
 				let mut copy = Box::new(self.clone());
-				copy.boolean_type = BooleanAstType::Conjunction;
-				copy.op_symbol = '&';
+				copy.change_type(BooleanAstType::Conjunction);
 				new_right.left = Some(copy);
-				self.boolean_type = BooleanAstType::Conjunction;
-				self.op_symbol = '&';
+				self.change_type(BooleanAstType::Conjunction);
 				self.left = Some(new_left);
 				self.right = Some(new_right);
 			},
@@ -294,7 +314,7 @@ impl BooleanAstNode {
 	}
 
 	fn node_string(mut tree: &mut String,
-		node_opt: &Option<Box<BooleanAstNode>>, mut padding: String,
+		node_opt: &Option<Box<Self>>, mut padding: String,
 		pointer: &str, has_left_sibling: bool) {
 		if let Some(node) = node_opt {
 			tree.push_str(&format!("\n{}{}{}",
@@ -305,9 +325,9 @@ impl BooleanAstNode {
 			padding.push_str(if has_left_sibling { "│  " } else { "   " });
 			let pointer_left = "└──";
 			let pointer_right = if node.has_left() { "├──" } else { "└──" };
-			BooleanAstNode::node_string(&mut tree, &node.right, padding.clone(),
+			Self::node_string(&mut tree, &node.right, padding.clone(),
 				pointer_right, node.has_left());
-			BooleanAstNode::node_string(&mut tree, &node.left, padding,
+			Self::node_string(&mut tree, &node.left, padding,
 				pointer_left, false);
 		}
 	}
@@ -321,9 +341,9 @@ impl BooleanAstNode {
 		if self.boolean_type == BooleanAstType::Variable {
 			tree.push_str(&format!("({})", self.op_symbol));
 		}
-		BooleanAstNode::node_string(&mut tree, &self.right, String::new(),
+		Self::node_string(&mut tree, &self.right, String::new(),
 			pointer_right, self.has_left());
-		BooleanAstNode::node_string(&mut tree, &self.left, String::new(),
+		Self::node_string(&mut tree, &self.left, String::new(),
 			pointer_left, false);
 		tree
 	}
