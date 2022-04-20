@@ -383,6 +383,35 @@ mod tests {
 		truth_diff(formula, &ast.to_formula());
 	}
 
+	#[test]
+	fn bool_ast_replace_logical_equivalence() {
+		let mut formula = "AB=";
+		let mut expected = "AB>BA>&";
+		let mut ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_logical_equivalence);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "ABC|=";
+		expected = "ABC|>BC|A>&";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_logical_equivalence);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "AB^CD|=";
+		expected = "AB^CD|>CD|AB^>&";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_logical_equivalence);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "ABCDEFGHI>==^====!";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_material_condition);
+		truth_diff(formula, &ast.to_formula());
+	}
+
 	/*
 	#[test]
 	fn nnf_subject_tests() {

@@ -316,6 +316,27 @@ impl BooleanAstNode {
 		}
 	}
 
+	pub fn replace_logical_equivalence(&mut self) {
+		if self.boolean_type != BooleanAstType::LogicalEquivalence { return };
+		match (&self.left, &self.right) {
+			(Some(_), Some(_)) => {
+				let mut new_right = Box::new(self.clone());
+				new_right.change_type(BooleanAstType::MaterialCondition);
+				std::mem::swap(&mut new_right.left, &mut new_right.right);
+				let mut new_left = Box::new(Self::new('>'));
+				std::mem::swap(&mut new_left.left, &mut self.left);
+				std::mem::swap(&mut new_left.right, &mut self.right);
+				self.change_type(BooleanAstType::Conjunction);
+				self.left = Some(new_left);
+				self.right = Some(new_right);
+			},
+			_ => {
+				panic!("missing operand for '{}' operation",
+					self.boolean_type.to_string());
+			},
+		}
+	}
+
 	fn has_left(&self) -> bool {
 		match self.left {
 			Some(_) => true,
