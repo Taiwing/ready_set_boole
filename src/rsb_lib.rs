@@ -282,12 +282,13 @@ impl BooleanAstNode {
 		if self.boolean_type != BooleanAstType::ExclusiveDisjunction { return };
 		match (&self.left, &self.right) {
 			(Some(_), Some(_)) => {
-				let mut new_left = Box::new(self.clone());
-				new_left.change_type(BooleanAstType::Disjunction);
 				let mut new_right = Box::new(Self::new('!'));
 				let mut copy = Box::new(self.clone());
 				copy.change_type(BooleanAstType::Conjunction);
 				new_right.left = Some(copy);
+				let mut new_left = Box::new(Self::new('|'));
+				std::mem::swap(&mut new_left.left, &mut self.left);
+				std::mem::swap(&mut new_left.right, &mut self.right);
 				self.change_type(BooleanAstType::Conjunction);
 				self.left = Some(new_left);
 				self.right = Some(new_right);
