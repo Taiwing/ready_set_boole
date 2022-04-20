@@ -354,6 +354,16 @@ mod tests {
 		truth_diff(formula, &ast.to_formula());
 	}
 
+	#[test]
+	fn bool_ast_replace_material_condition() {
+		let mut formula = "AB>";
+		let mut expected = "A!B|";
+		let mut ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_material_condition);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+	}
+
 	/*
 	#[test]
 	fn nnf_subject_tests() {
