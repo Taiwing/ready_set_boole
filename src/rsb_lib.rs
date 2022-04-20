@@ -300,6 +300,22 @@ impl BooleanAstNode {
 		}
 	}
 
+	pub fn replace_material_condition(&mut self) {
+		if self.boolean_type != BooleanAstType::MaterialCondition { return };
+		match (&self.left, &self.right) {
+			(Some(_), Some(_)) => {
+				self.change_type(BooleanAstType::Disjunction);
+				let mut new_left = Box::new(Self::new('!'));
+				std::mem::swap(&mut new_left.left, &mut self.left);
+				self.left = Some(new_left);
+			},
+			_ => {
+				panic!("missing operand for '{}' operation",
+					self.boolean_type.to_string());
+			},
+		}
+	}
+
 	fn has_left(&self) -> bool {
 		match self.left {
 			Some(_) => true,

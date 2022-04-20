@@ -362,6 +362,25 @@ mod tests {
 		ast.pre_order(BooleanAstNode::replace_material_condition);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
+
+		formula = "ABC|>";
+		expected = "A!BC||";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_material_condition);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "AB^CD|>";
+		expected = "AB^!CD||";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_material_condition);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "ABCDEFGHI>>^=>>||!";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_material_condition);
+		truth_diff(formula, &ast.to_formula());
 	}
 
 	/*
