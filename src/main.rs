@@ -412,6 +412,37 @@ mod tests {
 		truth_diff(formula, &ast.to_formula());
 	}
 
+	#[test]
+	fn bool_ast_eliminate_double_negation() {
+		let mut formula = "A!!";
+		let mut expected = "A";
+		let mut ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::eliminate_double_negation);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "A!!!!!B|";
+		expected = "A!B|";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::eliminate_double_negation);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "A!!!!!!B!!|";
+		expected = "AB|";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::eliminate_double_negation);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "AB|!!!!!!!CD!E|^!!|";
+		expected = "AB|!CD!E|^|";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::eliminate_double_negation);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+	}
+
 	/*
 	#[test]
 	fn nnf_subject_tests() {

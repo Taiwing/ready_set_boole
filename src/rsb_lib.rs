@@ -337,6 +337,24 @@ impl BooleanAstNode {
 		}
 	}
 
+	pub fn eliminate_double_negation(&mut self) {
+		let mut next_useful_node: Option<Box<Self>> = None;
+		if self.boolean_type != BooleanAstType::Negation { return };
+		if let Some(child) = &mut self.left {
+			if child.boolean_type != BooleanAstType::Negation { return };
+			if let Some(_) = &mut child.left {
+				std::mem::swap(&mut next_useful_node, &mut child.left);
+			}
+		}
+		if let Some(mut grand_child) = next_useful_node {
+			self.boolean_type = grand_child.boolean_type;
+			self.op_symbol = grand_child.op_symbol;
+			std::mem::swap(&mut self.left, &mut grand_child.left);
+			std::mem::swap(&mut self.right, &mut grand_child.right);
+			self.eliminate_double_negation();
+		}
+	}
+
 	fn has_left(&self) -> bool {
 		match self.left {
 			Some(_) => true,
