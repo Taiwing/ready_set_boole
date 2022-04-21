@@ -443,6 +443,37 @@ mod tests {
 		truth_diff(formula, expected);
 	}
 
+	#[test]
+	fn bool_ast_replace_junction_negation() {
+		let mut formula = "AB&!";
+		let mut expected = "A!B!|";
+		let mut ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_junction_negation);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "AB|!";
+		expected = "A!B!&";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_junction_negation);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "AB|!!";
+		expected = "A!B!&!";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_junction_negation);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+
+		formula = "AB&CD^|!";
+		expected = "A!B!|CD^!&";
+		ast = BooleanAstNode::tree(formula);
+		ast.pre_order(BooleanAstNode::replace_junction_negation);
+		assert_eq!(ast.to_formula(), expected);
+		truth_diff(formula, expected);
+	}
+
 	/*
 	#[test]
 	fn nnf_subject_tests() {

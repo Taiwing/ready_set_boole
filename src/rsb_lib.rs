@@ -355,6 +355,32 @@ impl BooleanAstNode {
 		}
 	}
 
+	pub fn replace_junction_negation(&mut self) {
+		let mut next_useful_node: Option<Box<Self>> = None;
+		if self.boolean_type != BooleanAstType::Negation { return };
+		if let Some(child) = &mut self.left {
+			if child.boolean_type != BooleanAstType::Disjunction
+				&& child.boolean_type != BooleanAstType::Conjunction {
+				return
+			};
+			std::mem::swap(&mut next_useful_node, &mut self.left);
+		}
+		if let Some(mut child) = next_useful_node {
+			let new_type = if child.boolean_type == BooleanAstType::Conjunction {
+				BooleanAstType::Disjunction
+			} else {
+				BooleanAstType::Conjunction
+			};
+			self.change_type(new_type);
+			let mut new_left = Box::new(Self::new('!'));
+			let mut new_right = Box::new(Self::new('!'));
+			std::mem::swap(&mut new_left.left, &mut child.left);
+			std::mem::swap(&mut new_right.left, &mut child.right);
+			self.left = Some(new_left);
+			self.right = Some(new_right);
+		}
+	}
+
 	fn has_left(&self) -> bool {
 		match self.left {
 			Some(_) => true,
