@@ -49,13 +49,21 @@ fn main() {
 	let expected = "PQ|PQ&!&A|";
 	truth_diff(formula, expected);
 
-	let formula = "AB&A!B!&|";
+	formula = "AB&A!B!&|";
 	let result = &negation_normal_form("AB=");
-	let formula_ast = BooleanAstNode::tree(formula);
-	let result_ast = BooleanAstNode::tree(result);
+	let mut formula_ast = BooleanAstNode::tree(formula);
+	let mut result_ast = BooleanAstNode::tree(result);
 	println!("formula: '{}'\n{}\n", formula, formula_ast);
 	println!("result: '{}'\n{}\n", result, result_ast);
 	truth_diff(formula, result);
+
+	formula = "AB&!CD|!EF>!GH^!&!&!&!";
+	let result = negation_normal_form(formula);
+	formula_ast = BooleanAstNode::tree(formula);
+	result_ast = BooleanAstNode::tree(&result);
+	println!("formula: '{}'\n{}\n", formula, formula_ast);
+	println!("result: '{}'\n{}\n", result, result_ast);
+	truth_diff(formula, &result);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -484,11 +492,44 @@ mod tests {
 
 	#[test]
 	fn nnf_subject_tests() {
-		assert_eq!("A!B!|", negation_normal_form("AB&!"));
-		assert_eq!("A!B!&", negation_normal_form("AB|!"));
-		assert_eq!("A!B|", negation_normal_form("AB>"));
+		let mut formula = "AB&!";
+		let mut ast = BooleanAstNode::tree(formula);
+		ast.to_nnf();
+		assert!(ast.negation_normal_form());
+		assert_eq!("A!B!|", negation_normal_form(formula));
+
+		formula = "AB|!";
+		ast = BooleanAstNode::tree(formula);
+		ast.to_nnf();
+		assert!(ast.negation_normal_form());
+		assert_eq!("A!B!&", negation_normal_form(formula));
+
+		formula = "AB>";
+		ast = BooleanAstNode::tree(formula);
+		ast.to_nnf();
+		assert!(ast.negation_normal_form());
+		assert_eq!("A!B|", negation_normal_form(formula));
+
+		formula = "AB=";
+		ast = BooleanAstNode::tree(formula);
+		ast.to_nnf();
+		assert!(ast.negation_normal_form());
 		//assert_eq!("AB&A!B!&|", negation_normal_form("AB="));
-		truth_diff("AB&A!B!&|", &negation_normal_form("AB="));
-		assert_eq!("A!B!&C!|", negation_normal_form("AB|C&!"));
+		truth_diff("AB&A!B!&|", &negation_normal_form(formula));
+
+		formula = "AB|C&!";
+		ast = BooleanAstNode::tree(formula);
+		ast.to_nnf();
+		assert!(ast.negation_normal_form());
+		assert_eq!("A!B!&C!|", negation_normal_form(formula));
+	}
+
+	#[test]
+	fn nnf_harder_tests() {
+		let formula = "AB&!CD|!EF>!GH^!&!&!&!";
+		let mut ast = BooleanAstNode::tree(formula);
+		ast.to_nnf();
+		assert!(ast.negation_normal_form());
+		truth_diff(formula, &negation_normal_form(formula));
 	}
 }

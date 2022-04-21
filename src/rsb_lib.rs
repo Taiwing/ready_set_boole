@@ -190,8 +190,6 @@ impl Clone for BooleanAstNode {
 	}
 }
 
-type BooleanNodeOp = fn (&mut BooleanAstNode);
-
 impl BooleanAstNode {
 	fn symbol_to_type(c: char) -> BooleanAstType {
 		match c {
@@ -268,7 +266,7 @@ impl BooleanAstNode {
 		ast
 	}
 
-	pub fn pre_order(&mut self, op: BooleanNodeOp) {
+	pub fn pre_order(&mut self, op: impl Fn(&mut Self) + Copy) {
 		op(self);
 		if let Some(left_node) = &mut self.left {
 			left_node.pre_order(op);
@@ -381,6 +379,27 @@ impl BooleanAstNode {
 		}
 	}
 
+	pub fn negation_normal_form(&self) -> bool {
+		match self.boolean_type {
+			BooleanAstType::Variable => true,
+			BooleanAstType::Negation => {
+				if let (Some(child), None) = (&self.left, &self.right) {
+					child.boolean_type == BooleanAstType::Variable
+				} else {
+					panic!("invalid '{}' op", self.boolean_type);
+				}
+			},
+			BooleanAstType::Disjunction | BooleanAstType::Conjunction => {
+				if let (Some(left), Some(right)) = (&self.left, &self.right) {
+					left.negation_normal_form() && right.negation_normal_form()
+				} else {
+					panic!("invalid '{}' op", self.boolean_type);
+				}
+			},
+			_ => false,
+		}
+	}
+
 	fn has_left(&self) -> bool {
 		match self.left {
 			Some(_) => true,
@@ -440,15 +459,19 @@ impl BooleanAstNode {
 		add_node(self, &mut formula);
 		formula
 	}
+
+	pub fn to_nnf(&mut self) {
+		self.pre_order(Self::replace_logical_equivalence);
+		self.pre_order(Self::replace_material_condition);
+		self.pre_order(Self::replace_exclusive_disjunction);
+		self.pre_order(Self::eliminate_double_negation);
+		self.pre_order(Self::replace_junction_negation);
+		self.pre_order(Self::eliminate_double_negation);
+	}
 }
 
 pub fn negation_normal_form(formula: &str) -> String {
 	let mut ast = BooleanAstNode::tree(formula);
-	ast.pre_order(BooleanAstNode::replace_logical_equivalence);
-	ast.pre_order(BooleanAstNode::replace_material_condition);
-	ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
-	ast.pre_order(BooleanAstNode::eliminate_double_negation);
-	ast.pre_order(BooleanAstNode::replace_junction_negation);
-	ast.pre_order(BooleanAstNode::eliminate_double_negation);
+	ast.to_nnf();
 	ast.to_formula()
 }
