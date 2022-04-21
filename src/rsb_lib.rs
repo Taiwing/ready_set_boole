@@ -443,5 +443,12 @@ impl BooleanAstNode {
 }
 
 pub fn negation_normal_form(formula: &str) -> String {
-	String::new()
+	let mut ast = BooleanAstNode::tree(formula);
+	ast.pre_order(BooleanAstNode::replace_logical_equivalence);
+	ast.pre_order(BooleanAstNode::replace_material_condition);
+	ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
+	ast.pre_order(BooleanAstNode::eliminate_double_negation);
+	ast.pre_order(BooleanAstNode::replace_junction_negation);
+	ast.pre_order(BooleanAstNode::eliminate_double_negation);
+	ast.to_formula()
 }

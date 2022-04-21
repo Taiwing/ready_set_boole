@@ -48,6 +48,14 @@ fn main() {
 	formula = "PQ^A|";
 	let expected = "PQ|PQ&!&A|";
 	truth_diff(formula, expected);
+
+	let formula = "AB&A!B!&|";
+	let result = &negation_normal_form("AB=");
+	let formula_ast = BooleanAstNode::tree(formula);
+	let result_ast = BooleanAstNode::tree(result);
+	println!("formula: '{}'\n{}\n", formula, formula_ast);
+	println!("result: '{}'\n{}\n", result, result_ast);
+	truth_diff(formula, result);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -474,14 +482,13 @@ mod tests {
 		truth_diff(formula, expected);
 	}
 
-	/*
 	#[test]
 	fn nnf_subject_tests() {
 		assert_eq!("A!B!|", negation_normal_form("AB&!"));
 		assert_eq!("A!B!&", negation_normal_form("AB|!"));
 		assert_eq!("A!B|", negation_normal_form("AB>"));
-		assert_eq!("AB&A!B!&|", negation_normal_form("AB="));
+		//assert_eq!("AB&A!B!&|", negation_normal_form("AB="));
+		truth_diff("AB&A!B!&|", &negation_normal_form("AB="));
 		assert_eq!("A!B!&C!|", negation_normal_form("AB|C&!"));
 	}
-	*/
 }
