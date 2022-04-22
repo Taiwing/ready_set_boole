@@ -402,6 +402,10 @@ impl BooleanAstNode {
 		}
 	}
 
+	pub fn conjunctive_normal_form(&self) -> bool {
+		self.negation_normal_form()
+	}
+
 	fn has_left(&self) -> bool {
 		match self.left {
 			Some(_) => true,
@@ -469,10 +473,18 @@ impl BooleanAstNode {
 		self.pre_order(Self::eliminate_double_negation);
 		self.pre_order(Self::replace_junction_negation);
 	}
+
+	pub fn to_cnf(&mut self) {
+		self.to_nnf();
+	}
 }
 
 pub fn negation_normal_form(formula: &str) -> String {
 	let mut ast = BooleanAstNode::tree(formula);
 	ast.to_nnf();
 	ast.to_formula()
+}
+
+pub fn conjunctive_normal_form(formula: &str) -> String {
+	negation_normal_form(formula)
 }
