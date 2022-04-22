@@ -374,6 +374,8 @@ impl BooleanAstNode {
 			let mut new_right = Box::new(Self::new('!'));
 			std::mem::swap(&mut new_left.left, &mut child.left);
 			std::mem::swap(&mut new_right.left, &mut child.right);
+			new_left.eliminate_double_negation();
+			new_right.eliminate_double_negation();
 			self.left = Some(new_left);
 			self.right = Some(new_right);
 		}
@@ -465,14 +467,7 @@ impl BooleanAstNode {
 		self.pre_order(Self::replace_material_condition);
 		self.pre_order(Self::replace_exclusive_disjunction);
 		self.pre_order(Self::eliminate_double_negation);
-		//TODO: This works but this is obvioulsy a monkey patch. Investigate
-		// this shit. Find where the 'replace_junction_negation' method fails or
-		// whatever else fails. Because this could cause an infinite loop. So
-		// not very good.
-		while self.negation_normal_form() == false {
-			self.pre_order(Self::replace_junction_negation);
-			self.pre_order(Self::eliminate_double_negation);
-		}
+		self.pre_order(Self::replace_junction_negation);
 	}
 }
 
