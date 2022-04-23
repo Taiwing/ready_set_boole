@@ -190,6 +190,24 @@ impl Clone for BooleanAstNode {
 	}
 }
 
+impl PartialEq for BooleanAstNode {
+	/// This is not the smartest way to do this, but it was already done lol
+	fn eq(&self, other: &Self) -> bool {
+		let left_formula = self.to_formula();
+		let right_formula = other.to_formula();
+		if left_formula == right_formula { return true };
+		match (truth_table::<std::io::Stdout>(&left_formula, None),
+			truth_table::<std::io::Stdout>(&right_formula, None)) {
+			(Some(left_truth), Some(right_truth)) => {
+				left_truth == right_truth
+			},
+			_ => panic!("missing truth"),
+		}
+	}
+}
+
+impl Eq for BooleanAstNode {}
+
 impl BooleanAstNode {
 	fn symbol_to_type(c: char) -> BooleanAstType {
 		match c {
@@ -335,7 +353,7 @@ impl BooleanAstNode {
 			BooleanAstType::Disjunction => {
 				inverse_type = BooleanAstType::Conjunction;
 			},
-			_ => panic!("cannot distribute {} op", boolean_type),
+			_ => panic!("cannot distribute '{}' op", boolean_type),
 		}
 		if self.boolean_type != boolean_type { return };
 		match (&self.left, &self.right) {
