@@ -572,6 +572,48 @@ mod tests {
 	}
 
 	#[test]
+	fn distribute() {
+		let formula = "ABC&|";
+		let mut ast = BooleanAstNode::tree(formula);
+		ast.distribute(BooleanAstType::Disjunction);
+		assert_eq!("AB|AC|&", ast.to_formula());
+		truth_diff(formula, &ast.to_formula());
+
+		let formula = "AD&C|";
+		ast = BooleanAstNode::tree(formula);
+		ast.distribute(BooleanAstType::Disjunction);
+		assert_eq!("AC|DC|&", ast.to_formula());
+		truth_diff(formula, &ast.to_formula());
+
+		let formula = "ABC|&";
+		ast = BooleanAstNode::tree(formula);
+		ast.distribute(BooleanAstType::Conjunction);
+		assert_eq!("AB&AC&|", ast.to_formula());
+		truth_diff(formula, &ast.to_formula());
+
+		let formula = "AD|C&";
+		ast = BooleanAstNode::tree(formula);
+		ast.distribute(BooleanAstType::Conjunction);
+		assert_eq!("AC&DC&|", ast.to_formula());
+		truth_diff(formula, &ast.to_formula());
+	}
+
+	#[test]
+	fn factor() {
+		let formula = "AB|AC|&";
+		let mut ast = BooleanAstNode::tree(formula);
+		ast.factor(BooleanAstType::Disjunction);
+		assert_eq!("ABC&|", ast.to_formula());
+		truth_diff(formula, &ast.to_formula());
+
+		let formula = "AB&AC&|";
+		ast = BooleanAstNode::tree(formula);
+		ast.factor(BooleanAstType::Conjunction);
+		assert_eq!("ABC|&", ast.to_formula());
+		truth_diff(formula, &ast.to_formula());
+	}
+
+	#[test]
 	fn cnf_subject_tests() {
 		let mut formula = "AB&!";
 		let mut ast = BooleanAstNode::tree(formula);

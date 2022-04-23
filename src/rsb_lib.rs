@@ -325,11 +325,58 @@ impl BooleanAstNode {
 		}
 	}
 
-	/*
-	pub fn distribute(&mut self) {
-		
+	pub fn distribute(&mut self, boolean_type: BooleanAstType) {
+		let mut order_swap = false;
+		let inverse_type: BooleanAstType;
+		match boolean_type {
+			BooleanAstType::Conjunction => {
+				inverse_type = BooleanAstType::Disjunction;
+			},
+			BooleanAstType::Disjunction => {
+				inverse_type = BooleanAstType::Conjunction;
+			},
+			_ => panic!("cannot distribute {} op", boolean_type),
+		}
+		if self.boolean_type != boolean_type { return };
+		match (&self.left, &self.right) {
+			(Some(left), Some(right)) => {
+				if right.boolean_type != inverse_type {
+					if left.boolean_type != inverse_type { return };
+					order_swap = true;
+					std::mem::swap(&mut self.left, &mut self.right);
+				}
+			},
+			_ => {
+				panic!("missing operand for '{}' operation", self.boolean_type);
+			},
+		}
+		if let (Some(left), Some(right)) = (&self.left, &mut self.right) {
+			let mut new_left =
+				Box::new(Self::new(Self::type_to_symbol(boolean_type)));
+			new_left.left = Some(left.clone());
+			std::mem::swap(&mut new_left.right, &mut self.left);
+			right.change_type(boolean_type);
+			std::mem::swap(&mut new_left.right, &mut right.left);
+			if order_swap {
+				std::mem::swap(&mut right.left, &mut right.right);
+				std::mem::swap(&mut new_left.left, &mut new_left.right);
+			}
+			self.left = Some(new_left);
+		}
+		self.change_type(inverse_type);
 	}
-	*/
+
+	pub fn factor(&mut self, boolean_type: BooleanAstType) {
+		match boolean_type {
+			BooleanAstType::Conjunction => {
+				if self.boolean_type != BooleanAstType::Disjunction { return };
+			},
+			BooleanAstType::Disjunction => {
+				if self.boolean_type != BooleanAstType::Conjunction { return };
+			},
+			_ => panic!("cannot factor {} op", boolean_type),
+		}
+	}
 
 	pub fn replace_exclusive_disjunction(&mut self) {
 		if self.boolean_type != BooleanAstType::ExclusiveDisjunction { return };
