@@ -148,7 +148,7 @@ pub fn print_truth_table(formula: &str) {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-enum BooleanAstType {
+pub enum BooleanAstType {
 	Variable,
 	Negation,
 	Conjunction,
@@ -234,8 +234,7 @@ impl BooleanAstNode {
 			child.init_children(formula);
 			child
 		} else {
-			panic!("missing operand for '{}' operation",
-				self.boolean_type.to_string());
+			panic!("missing operand for '{}' operation", self.boolean_type);
 		}
 	}
 
@@ -276,7 +275,36 @@ impl BooleanAstNode {
 		}
 	}
 
-	pub fn right_rotate(&mut self) {
+	pub fn is_valid_rotation(&self, boolean_type: BooleanAstType, is_left: bool) -> bool {
+		match boolean_type {
+			BooleanAstType::Variable => {
+				panic!("cannot rotate '{}' node because it has no operand",
+					boolean_type);
+			},
+			BooleanAstType::Negation => {
+				panic!("cannot rotate '{}' node because it only has 1 operand",
+					boolean_type);
+			},
+			BooleanAstType::MaterialCondition => {
+				panic!("cannot rotate '{}' node because it is non-commutative",
+					boolean_type);
+			},
+			_ => (),
+		}
+		if self.boolean_type != boolean_type { return false };
+		match (&self.left, &self.right, is_left) {
+			(Some(left), _, false) => {
+				left.boolean_type == boolean_type
+			},
+			(_, Some(right), true) => {
+				right.boolean_type == boolean_type
+			},
+			_ => panic!("invalid '{}' op", self.boolean_type),
+		}
+	}
+
+	pub fn right_rotate(&mut self, boolean_type: BooleanAstType) {
+		if self.is_valid_rotation(boolean_type, false) == false { return };
 		std::mem::swap(&mut self.left, &mut self.right);
 		if let Some(right) = &mut self.right {
 			std::mem::swap(&mut right.left, &mut right.right);
@@ -286,7 +314,8 @@ impl BooleanAstNode {
 		}
 	}
 
-	pub fn left_rotate(&mut self) {
+	pub fn left_rotate(&mut self, boolean_type: BooleanAstType) {
+		if self.is_valid_rotation(boolean_type, true) == false { return };
 		std::mem::swap(&mut self.left, &mut self.right);
 		if let Some(left) = &mut self.left {
 			std::mem::swap(&mut left.left, &mut left.right);
@@ -295,6 +324,12 @@ impl BooleanAstNode {
 			std::mem::swap(&mut self.boolean_type, &mut left.boolean_type);
 		}
 	}
+
+	/*
+	pub fn distribute(&mut self) {
+		
+	}
+	*/
 
 	pub fn replace_exclusive_disjunction(&mut self) {
 		if self.boolean_type != BooleanAstType::ExclusiveDisjunction { return };
@@ -312,8 +347,7 @@ impl BooleanAstNode {
 				self.right = Some(new_right);
 			},
 			_ => {
-				panic!("missing operand for '{}' operation",
-					self.boolean_type.to_string());
+				panic!("missing operand for '{}' operation", self.boolean_type);
 			},
 		}
 	}
@@ -328,8 +362,7 @@ impl BooleanAstNode {
 				self.left = Some(new_left);
 			},
 			_ => {
-				panic!("missing operand for '{}' operation",
-					self.boolean_type.to_string());
+				panic!("missing operand for '{}' operation", self.boolean_type);
 			},
 		}
 	}
@@ -349,8 +382,7 @@ impl BooleanAstNode {
 				self.right = Some(new_right);
 			},
 			_ => {
-				panic!("missing operand for '{}' operation",
-					self.boolean_type.to_string());
+				panic!("missing operand for '{}' operation", self.boolean_type);
 			},
 		}
 	}
@@ -445,7 +477,7 @@ impl BooleanAstNode {
 		pointer: &str, has_left_sibling: bool) {
 		if let Some(node) = node_opt {
 			tree.push_str(&format!("\n{}{}{}",
-				padding, pointer, node.boolean_type.to_string()));
+				padding, pointer, node.boolean_type));
 			if node.boolean_type == BooleanAstType::Variable {
 				tree.push_str(&format!("({})", node.op_symbol));
 			}

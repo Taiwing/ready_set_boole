@@ -71,7 +71,13 @@ fn main() {
 	result_ast = BooleanAstNode::tree(result);
 	println!("formula: '{}'\n{}\n", formula, formula_ast);
 	println!("result: '{}'\n{}\n", result, result_ast);
-	truth_diff(formula, &result);
+
+	formula = "ABCD&|&";
+	let result = "ABC|BD|&&";
+	formula_ast = BooleanAstNode::tree(formula);
+	result_ast = BooleanAstNode::tree(result);
+	println!("formula: '{}'\n{}\n", formula, formula_ast);
+	println!("result: '{}'\n{}\n", result, result_ast);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -545,16 +551,23 @@ mod tests {
 	fn rotations() {
 		let mut formula = "AB|C|";
 		let mut ast = BooleanAstNode::tree(formula);
-		ast.right_rotate();
+		ast.right_rotate(BooleanAstType::Disjunction);
 		assert_eq!("ABC||", ast.to_formula());
-		ast.left_rotate();
+		ast.left_rotate(BooleanAstType::Disjunction);
+		assert_eq!(formula, ast.to_formula());
+
+		formula = "AB&C&";
+		ast = BooleanAstNode::tree(formula);
+		ast.right_rotate(BooleanAstType::Conjunction);
+		assert_eq!("ABC&&", ast.to_formula());
+		ast.left_rotate(BooleanAstType::Conjunction);
 		assert_eq!(formula, ast.to_formula());
 
 		formula = "AB&C|";
 		ast = BooleanAstNode::tree(formula);
-		ast.right_rotate();
-		assert_eq!("ABC|&", ast.to_formula());
-		ast.left_rotate();
+		ast.right_rotate(BooleanAstType::Disjunction);
+		assert_eq!(formula, ast.to_formula());
+		ast.left_rotate(BooleanAstType::Disjunction);
 		assert_eq!(formula, ast.to_formula());
 	}
 
