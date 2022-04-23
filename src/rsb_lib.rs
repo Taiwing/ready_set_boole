@@ -164,6 +164,7 @@ impl fmt::Display for BooleanAstType {
 	}
 }
 
+#[derive(Debug)]
 pub struct BooleanAstNode {
 	boolean_type: BooleanAstType,
 	op_symbol: char,
@@ -295,12 +296,22 @@ impl BooleanAstNode {
 
 	pub fn in_order(&mut self, op: impl Fn(&mut Self) + Copy) {
 		if let Some(left_node) = &mut self.left {
-			left_node.pre_order(op);
+			left_node.in_order(op);
 		}
 		op(self);
 		if let Some(right_node) = &mut self.right {
-			right_node.pre_order(op);
+			right_node.in_order(op);
 		}
+	}
+
+	pub fn post_order(&mut self, op: impl Fn(&mut Self) + Copy) {
+		if let Some(left_node) = &mut self.left {
+			left_node.post_order(op);
+		}
+		if let Some(right_node) = &mut self.right {
+			right_node.post_order(op);
+		}
+		op(self);
 	}
 
 	pub fn is_valid_rotation(&self, boolean_type: BooleanAstType, is_left: bool) -> bool {
@@ -564,6 +575,10 @@ impl BooleanAstNode {
 		self.factor(BooleanAstType::Conjunction);
 	}
 
+	pub fn left_rotate_disjunction(&mut self) {
+		self.left_rotate(BooleanAstType::Disjunction);
+	}
+
 	pub fn right_rotate_disjunction(&mut self) {
 		self.right_rotate(BooleanAstType::Disjunction);
 	}
@@ -688,13 +703,29 @@ impl BooleanAstNode {
 		self.pre_order(Self::replace_junction_negation);
 	}
 
+	fn cnf_op(&mut self) {
+		self.right_rotate_conjunction();
+		self.left_rotate_disjunction();
+		self.replace_disjunction();
+		self.right_rotate_disjunction();
+	}
+
 	pub fn to_cnf(&mut self) {
 		self.to_nnf();
+		self.in_order(Self::cnf_op);
+		/*
 		//TODO: I finally understood, make it so the conjunctions are ONLY on
 		//the right side of the tree (and on the right side of the right side)
-		self.pre_order(Self::replace_disjunction);
-		self.in_order(Self::right_rotate_disjunction);
+		println!("result (after nnf): '{}'\n{}\n", self.to_formula(), self);
+		self.in_order(Self::left_rotate_disjunction);
+		println!("result (after left rot '|'): '{}'\n{}\n", self.to_formula(), self);
 		self.in_order(Self::right_rotate_conjunction);
+		println!("result (after right rot '&'): '{}'\n{}\n", self.to_formula(), self);
+		self.in_order(Self::replace_disjunction);
+		println!("result (after replace '|'): '{}'\n{}\n", self.to_formula(), self);
+		self.in_order(Self::replace_disjunction);
+		println!("result (after replace '|' 2): '{}'\n{}\n", self.to_formula(), self);
+		*/
 	}
 }
 

@@ -82,11 +82,19 @@ fn main() {
 	println!("formula: '{}'\n{}\n", formula, formula_ast);
 	println!("result: '{}'\n{}\n", result, result_ast);
 
-	formula = "ABCDE&||&";
-	ast = BooleanAstNode::tree(formula);
-	println!("formula: '{}'\n{}\n", formula, ast);
-	ast.to_cnf();
-	println!("result: '{}'\n{}\n", ast.to_formula(), ast);
+	formula = "ABCDEFGH>IJKL|&|&|&|&|&";
+	let mut orig = BooleanAstNode::tree(formula);
+	println!("orig: '{}'\n{}\n", formula, orig);
+	let mut mine = orig.clone();
+	mine.to_cnf();
+	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
+
+	formula = "ABC|BD|E|BD&F|G!H||BDF||I|J|BDFI|||KL||&&&&&";
+	orig = BooleanAstNode::tree(formula);
+	println!("orig: '{}'\n{}\n", formula, orig);
+	mine = orig.clone();
+	mine.to_cnf();
+	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -671,18 +679,23 @@ mod tests {
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
 		assert_eq!("ABC|BD|&&", conjunctive_normal_form(formula));
+	}
 
-		/*
-		formula = "ABCDE&||&";
-		ast = BooleanAstNode::tree(formula);
-		ast.to_cnf();
-		assert!(ast.conjunctive_normal_form());
+	#[test]
+	fn cnf_harder_tests() {
+		let mut formula = "ABCDE&||&";
+		let mut orig = BooleanAstNode::tree(formula);
+		let mut mine = orig.clone();
+		mine.to_cnf();
+		assert_eq!(orig, mine);
+		assert!(mine.conjunctive_normal_form());
 		//assert_eq!("ABC|BD|&&", conjunctive_normal_form(formula));
 
 		formula = "ABCDEFGH>IJKL|&|&|&|&|&";
-		ast = BooleanAstNode::tree(formula);
-		ast.to_cnf();
-		assert!(ast.conjunctive_normal_form());
-		*/
+		orig = BooleanAstNode::tree(formula);
+		mine = orig.clone();
+		mine.to_cnf();
+		assert_eq!(orig, mine);
+		assert!(mine.conjunctive_normal_form());
 	}
 }
