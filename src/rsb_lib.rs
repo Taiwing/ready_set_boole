@@ -593,8 +593,31 @@ impl BooleanAstNode {
 		}
 	}
 
+	fn cnf_check(&self, mut accept_conjunctions: bool) -> bool {
+		match (self.boolean_type, accept_conjunctions) {
+			(BooleanAstType::Conjunction, true) => {
+				if let (Some(left), Some(right)) = (&self.left, &self.right) {
+					left.cnf_check(false) && right.cnf_check(true)
+				} else {
+					panic!("invalid '{}' op", self.boolean_type);
+				}
+			},
+			(BooleanAstType::Conjunction, false) => false,
+			(BooleanAstType::Disjunction, _) => {
+				if let (Some(left), Some(right)) = (&self.left, &self.right) {
+					left.cnf_check(false) && right.cnf_check(false)
+				} else {
+					panic!("invalid '{}' op", self.boolean_type);
+				}
+			},
+			(BooleanAstType::Variable, _) => true,
+			(BooleanAstType::Negation, _) => true,
+			_ => panic!("invalid op '{}' in CNF", self.boolean_type),
+		}
+	}
+
 	pub fn conjunctive_normal_form(&self) -> bool {
-		self.negation_normal_form()
+		self.negation_normal_form() && self.cnf_check(true)
 	}
 
 	fn has_left(&self) -> bool {
@@ -667,6 +690,8 @@ impl BooleanAstNode {
 
 	pub fn to_cnf(&mut self) {
 		self.to_nnf();
+		//TODO: I finally understood, make it so the conjunctions are ONLY on
+		//the right side of the tree (and on the right side of the right side)
 		self.pre_order(Self::replace_disjunction);
 		self.in_order(Self::right_rotate_disjunction);
 		self.in_order(Self::right_rotate_conjunction);

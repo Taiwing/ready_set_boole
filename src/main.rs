@@ -81,6 +81,12 @@ fn main() {
 	result_ast = BooleanAstNode::tree(result);
 	println!("formula: '{}'\n{}\n", formula, formula_ast);
 	println!("result: '{}'\n{}\n", result, result_ast);
+
+	formula = "ABCDE&||&";
+	ast = BooleanAstNode::tree(formula);
+	println!("formula: '{}'\n{}\n", formula, ast);
+	ast.to_cnf();
+	println!("result: '{}'\n{}\n", ast.to_formula(), ast);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -665,5 +671,18 @@ mod tests {
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
 		assert_eq!("ABC|BD|&&", conjunctive_normal_form(formula));
+
+		/*
+		formula = "ABCDE&||&";
+		ast = BooleanAstNode::tree(formula);
+		ast.to_cnf();
+		assert!(ast.conjunctive_normal_form());
+		//assert_eq!("ABC|BD|&&", conjunctive_normal_form(formula));
+
+		formula = "ABCDEFGH>IJKL|&|&|&|&|&";
+		ast = BooleanAstNode::tree(formula);
+		ast.to_cnf();
+		assert!(ast.conjunctive_normal_form());
+		*/
 	}
 }
