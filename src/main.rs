@@ -69,8 +69,11 @@ fn main() {
 	let result = "ABCD|||";
 	formula_ast = BooleanAstNode::tree(formula);
 	result_ast = BooleanAstNode::tree(result);
+	ast = BooleanAstNode::tree(formula);
+	ast.to_cnf();
 	println!("formula: '{}'\n{}\n", formula, formula_ast);
 	println!("result: '{}'\n{}\n", result, result_ast);
+	println!("mine: '{}'\n{}\n", ast.to_formula(), ast);
 
 	formula = "ABCD&|&";
 	let result = "ABC|BD|&&";

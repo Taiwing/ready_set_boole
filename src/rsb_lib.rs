@@ -293,6 +293,16 @@ impl BooleanAstNode {
 		}
 	}
 
+	pub fn in_order(&mut self, op: impl Fn(&mut Self) + Copy) {
+		if let Some(left_node) = &mut self.left {
+			left_node.pre_order(op);
+		}
+		op(self);
+		if let Some(right_node) = &mut self.right {
+			right_node.pre_order(op);
+		}
+	}
+
 	pub fn is_valid_rotation(&self, boolean_type: BooleanAstType, is_left: bool) -> bool {
 		match boolean_type {
 			BooleanAstType::Variable => {
@@ -549,6 +559,19 @@ impl BooleanAstNode {
 		}
 	}
 
+	pub fn replace_disjunction(&mut self) {
+		self.distribute(BooleanAstType::Disjunction);
+		self.factor(BooleanAstType::Conjunction);
+	}
+
+	pub fn right_rotate_disjunction(&mut self) {
+		self.right_rotate(BooleanAstType::Disjunction);
+	}
+
+	pub fn right_rotate_conjunction(&mut self) {
+		self.right_rotate(BooleanAstType::Conjunction);
+	}
+
 	pub fn negation_normal_form(&self) -> bool {
 		match self.boolean_type {
 			BooleanAstType::Variable => true,
@@ -644,6 +667,9 @@ impl BooleanAstNode {
 
 	pub fn to_cnf(&mut self) {
 		self.to_nnf();
+		self.pre_order(Self::replace_disjunction);
+		self.in_order(Self::right_rotate_disjunction);
+		self.in_order(Self::right_rotate_conjunction);
 	}
 }
 
@@ -654,5 +680,7 @@ pub fn negation_normal_form(formula: &str) -> String {
 }
 
 pub fn conjunctive_normal_form(formula: &str) -> String {
-	negation_normal_form(formula)
+	let mut ast = BooleanAstNode::tree(formula);
+	ast.to_cnf();
+	ast.to_formula()
 }
