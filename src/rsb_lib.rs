@@ -385,15 +385,66 @@ impl BooleanAstNode {
 	}
 
 	pub fn factor(&mut self, boolean_type: BooleanAstType) {
+		let mut common_factor: Option<Box<Self>> = None;
+		let mut term_a: Option<Box<Self>> = None;
+		let mut term_b: Option<Box<Self>> = None;
+		let inverse_type: BooleanAstType;
 		match boolean_type {
 			BooleanAstType::Conjunction => {
-				if self.boolean_type != BooleanAstType::Disjunction { return };
+				inverse_type = BooleanAstType::Disjunction;
 			},
 			BooleanAstType::Disjunction => {
-				if self.boolean_type != BooleanAstType::Conjunction { return };
+				inverse_type = BooleanAstType::Conjunction;
 			},
 			_ => panic!("cannot factor {} op", boolean_type),
 		}
+		if self.boolean_type != inverse_type { return };
+		match (&mut self.left, &mut self.right) {
+			(Some(left), Some(right)) => {
+				if right.boolean_type != boolean_type
+					|| left.boolean_type != boolean_type {
+					return
+				}
+				match (&mut left.left, &mut left.right,
+					&mut right.left, &mut right.right) {
+					(Some(ll), Some(lr), Some(rl), Some(rr)) => {
+						if ll == rl {
+							std::mem::swap(&mut common_factor, &mut left.left);
+							std::mem::swap(&mut term_a, &mut left.right);
+							std::mem::swap(&mut term_b, &mut right.right);
+						} else if ll == rr {
+							std::mem::swap(&mut common_factor, &mut left.left);
+							std::mem::swap(&mut term_a, &mut left.right);
+							std::mem::swap(&mut term_b, &mut right.left);
+						} else if lr == rl {
+							std::mem::swap(&mut common_factor, &mut left.right);
+							std::mem::swap(&mut term_a, &mut left.left);
+							std::mem::swap(&mut term_b, &mut right.right);
+						} else if lr == rr {
+							std::mem::swap(&mut common_factor, &mut left.right);
+							std::mem::swap(&mut term_a, &mut left.left);
+							std::mem::swap(&mut term_b, &mut right.left);
+						} else {
+							return
+						}
+					},
+					_ => {
+						panic!("missing operand for '{}' operation",
+							boolean_type);
+					},
+				}
+			},
+			_ => {
+				panic!("missing operand for '{}' operation", self.boolean_type);
+			},
+		}
+		self.change_type(boolean_type);
+		std::mem::swap(&mut self.left, &mut common_factor);
+		let mut new_right =
+			Box::new(Self::new(Self::type_to_symbol(inverse_type)));
+		std::mem::swap(&mut new_right.left, &mut term_a);
+		std::mem::swap(&mut new_right.right, &mut term_b);
+		self.right = Some(new_right);
 	}
 
 	pub fn replace_exclusive_disjunction(&mut self) {
