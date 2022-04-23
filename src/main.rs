@@ -611,6 +611,24 @@ mod tests {
 		ast.factor(BooleanAstType::Conjunction);
 		assert_eq!("ABC|&", ast.to_formula());
 		truth_diff(formula, &ast.to_formula());
+
+		let formula = "AB|CA|&";
+		ast = BooleanAstNode::tree(formula);
+		ast.factor(BooleanAstType::Disjunction);
+		assert_eq!("ABC&|", ast.to_formula());
+		truth_diff(formula, &ast.to_formula());
+
+		let formula = "BA|AC|&";
+		ast = BooleanAstNode::tree(formula);
+		ast.factor(BooleanAstType::Disjunction);
+		assert_eq!("ABC&|", ast.to_formula());
+		truth_diff(formula, &ast.to_formula());
+
+		let formula = "BA|CA|&";
+		ast = BooleanAstNode::tree(formula);
+		ast.factor(BooleanAstType::Disjunction);
+		assert_eq!("ABC&|", ast.to_formula());
+		truth_diff(formula, &ast.to_formula());
 	}
 
 	#[test]
