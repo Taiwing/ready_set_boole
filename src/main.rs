@@ -64,6 +64,14 @@ fn main() {
 	println!("formula: '{}'\n{}\n", formula, formula_ast);
 	println!("result: '{}'\n{}\n", result, result_ast);
 	truth_diff(formula, &result);
+
+	formula = "AB|C|D|";
+	let result = "ABCD|||";
+	formula_ast = BooleanAstNode::tree(formula);
+	result_ast = BooleanAstNode::tree(result);
+	println!("formula: '{}'\n{}\n", formula, formula_ast);
+	println!("result: '{}'\n{}\n", result, result_ast);
+	truth_diff(formula, &result);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -534,6 +542,23 @@ mod tests {
 	}
 
 	#[test]
+	fn rotations() {
+		let mut formula = "AB|C|";
+		let mut ast = BooleanAstNode::tree(formula);
+		ast.right_rotate();
+		assert_eq!("ABC||", ast.to_formula());
+		ast.left_rotate();
+		assert_eq!(formula, ast.to_formula());
+
+		formula = "AB&C|";
+		ast = BooleanAstNode::tree(formula);
+		ast.right_rotate();
+		assert_eq!("ABC|&", ast.to_formula());
+		ast.left_rotate();
+		assert_eq!(formula, ast.to_formula());
+	}
+
+	#[test]
 	fn cnf_subject_tests() {
 		let mut formula = "AB&!";
 		let mut ast = BooleanAstNode::tree(formula);
@@ -552,5 +577,11 @@ mod tests {
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
 		assert_eq!("AB|C&", conjunctive_normal_form(formula));
+
+		formula = "AB|C|D|";
+		ast = BooleanAstNode::tree(formula);
+		ast.to_cnf();
+		assert!(ast.conjunctive_normal_form());
+		assert_eq!("ABCD|||", conjunctive_normal_form(formula));
 	}
 }

@@ -276,6 +276,26 @@ impl BooleanAstNode {
 		}
 	}
 
+	pub fn right_rotate(&mut self) {
+		std::mem::swap(&mut self.left, &mut self.right);
+		if let Some(right) = &mut self.right {
+			std::mem::swap(&mut right.left, &mut right.right);
+			std::mem::swap(&mut self.left, &mut right.right);
+			std::mem::swap(&mut self.op_symbol, &mut right.op_symbol);
+			std::mem::swap(&mut self.boolean_type, &mut right.boolean_type);
+		}
+	}
+
+	pub fn left_rotate(&mut self) {
+		std::mem::swap(&mut self.left, &mut self.right);
+		if let Some(left) = &mut self.left {
+			std::mem::swap(&mut left.left, &mut left.right);
+			std::mem::swap(&mut self.right, &mut left.left);
+			std::mem::swap(&mut self.op_symbol, &mut left.op_symbol);
+			std::mem::swap(&mut self.boolean_type, &mut left.boolean_type);
+		}
+	}
+
 	pub fn replace_exclusive_disjunction(&mut self) {
 		if self.boolean_type != BooleanAstType::ExclusiveDisjunction { return };
 		match (&self.left, &self.right) {
