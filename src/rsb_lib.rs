@@ -431,6 +431,41 @@ impl BooleanAstNode {
 		(left_operands, right_operands)
 	}
 
+	fn build_right_handed_tree_from_operand_list(
+		&mut self,
+		mut new_nodes: Vec<Box<Self>>,
+		target_type: BooleanAstType,
+	) {
+		let mut tmp: Box<Self>;
+		let mut new_right: Option<Box<Self>> = None;
+
+		loop {
+			match new_nodes.len() {
+				0 => panic!("missing nodes"),
+				1 => {
+					std::mem::swap(&mut self.right, &mut new_right);
+					self.left = new_nodes.pop();
+					break;
+				},
+				_ => {
+					match new_right {
+						None => {
+							new_right = new_nodes.pop();
+						},
+						Some(_) => {
+							tmp = Box::new(
+								Self::new(Self::type_to_symbol(target_type))
+							);
+							tmp.left = new_nodes.pop();
+							tmp.right = new_right;
+							new_right = Some(tmp);
+						},
+					}
+				},
+			}
+		}
+	}
+
 	pub fn distribute(&mut self, boolean_type: BooleanAstType) {
 		let inverse_type: BooleanAstType;
 		let mut new_node: Box<Self>;
@@ -483,33 +518,7 @@ impl BooleanAstNode {
 				}
 			}
 		}
-		let mut tmp: Box<Self>;
-		let mut new_right: Option<Box<Self>> = None;
-		loop {
-			match new_nodes.len() {
-				0 => panic!("missing nodes"),
-				1 => {
-					std::mem::swap(&mut self.right, &mut new_right);
-					self.left = new_nodes.pop();
-					break;
-				},
-				_ => {
-					match new_right {
-						None => {
-							new_right = new_nodes.pop();
-						},
-						Some(_) => {
-							tmp = Box::new(
-								Self::new(Self::type_to_symbol(inverse_type))
-							);
-							tmp.left = new_nodes.pop();
-							tmp.right = new_right;
-							new_right = Some(tmp);
-						},
-					}
-				},
-			}
-		}
+		self.build_right_handed_tree_from_operand_list(new_nodes, inverse_type);
 		println!("END distribute(): '{}'\n\n", self.to_formula());
 	}
 
