@@ -704,28 +704,17 @@ impl BooleanAstNode {
 	}
 
 	fn cnf_op(&mut self) {
-		self.right_rotate_conjunction();
+		//TODO: I finally understood, make it so the conjunctions are ONLY on
+		//the right side of the tree (and on the right side of the right side)
 		self.left_rotate_disjunction();
 		self.replace_disjunction();
+		self.right_rotate_conjunction();
 		self.right_rotate_disjunction();
 	}
 
 	pub fn to_cnf(&mut self) {
 		self.to_nnf();
 		self.in_order(Self::cnf_op);
-		/*
-		//TODO: I finally understood, make it so the conjunctions are ONLY on
-		//the right side of the tree (and on the right side of the right side)
-		println!("result (after nnf): '{}'\n{}\n", self.to_formula(), self);
-		self.in_order(Self::left_rotate_disjunction);
-		println!("result (after left rot '|'): '{}'\n{}\n", self.to_formula(), self);
-		self.in_order(Self::right_rotate_conjunction);
-		println!("result (after right rot '&'): '{}'\n{}\n", self.to_formula(), self);
-		self.in_order(Self::replace_disjunction);
-		println!("result (after replace '|'): '{}'\n{}\n", self.to_formula(), self);
-		self.in_order(Self::replace_disjunction);
-		println!("result (after replace '|' 2): '{}'\n{}\n", self.to_formula(), self);
-		*/
 	}
 }
 

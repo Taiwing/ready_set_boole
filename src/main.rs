@@ -697,5 +697,12 @@ mod tests {
 		mine.to_cnf();
 		assert_eq!(orig, mine);
 		assert!(mine.conjunctive_normal_form());
+
+		formula = "ABC|BD|E|BD&F|G!H||BDF||I|J|BDFI|||KL||&&&&&";
+		orig = BooleanAstNode::tree(formula);
+		mine = orig.clone();
+		mine.to_cnf();
+		assert_eq!(orig, mine);
+		assert!(mine.conjunctive_normal_form());
 	}
 }
