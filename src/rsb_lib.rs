@@ -294,19 +294,6 @@ impl BooleanAstNode {
 		}
 	}
 
-	/*
-	pub fn one_sided_pre_order(&mut self, op: impl Fn(&mut Self) + Copy, is_left: bool) {
-		if let Some(left_node) = &mut self.left {
-			if is_left { op(left_node); };
-			left_node.one_sided_pre_order(op, is_left);
-		}
-		if let Some(right_node) = &mut self.right {
-			if is_left == false {  op(right_node); };
-			right_node.one_sided_pre_order(op, is_left);
-		}
-	}
-	*/
-
 	pub fn in_order(&mut self, op: impl Fn(&mut Self) + Copy) {
 		if let Some(left_node) = &mut self.left {
 			left_node.in_order(op);
@@ -395,9 +382,59 @@ impl BooleanAstNode {
 		}
 	}
 
+	pub fn consume(
+		mut self
+	) -> (BooleanAstType, char, Option<Box<Self>>, Option<Box<Self>>) {
+		(self.boolean_type, self.op_symbol, self.left, self.right)
+	}
+
+	fn get_operands(
+		&mut self,
+		inverse_type: BooleanAstType,
+	) -> (Vec<Option<Box<Self>>>, Vec<Option<Box<Self>>>) {
+		let mut node: Option<Box<Self>>;
+		let mut left_operands: Vec<Option<Box<Self>>> = vec![];
+		let mut right_operands: Vec<Option<Box<Self>>> = vec![];
+
+		match (&mut self.left, &mut self.right) {
+			(Some(l), Some(r)) => {
+				if self.boolean_type != inverse_type
+					&& l.boolean_type != inverse_type
+					&& r.boolean_type != inverse_type {
+					return (left_operands, right_operands);
+				}
+				if l.boolean_type != inverse_type {
+					node = None;
+					std::mem::swap(&mut node, &mut self.left);
+					left_operands.push(node);
+				} else {
+					let (mut lvec, mut rvec) = l.get_operands(inverse_type);
+					left_operands.append(&mut lvec);
+					left_operands.append(&mut rvec);
+					self.left = None;
+				}
+				if r.boolean_type != inverse_type {
+					node = None;
+					std::mem::swap(&mut node, &mut self.right);
+					right_operands.push(node);
+				} else {
+					let (mut lvec, mut rvec) = r.get_operands(inverse_type);
+					right_operands.append(&mut lvec);
+					right_operands.append(&mut rvec);
+					self.right = None;
+				}
+			},
+			_ => {
+				panic!("missing operand for '{}' operation", self.boolean_type);
+			},
+		}
+		(left_operands, right_operands)
+	}
+
 	pub fn distribute(&mut self, boolean_type: BooleanAstType) {
-		let mut order_swap = false;
 		let inverse_type: BooleanAstType;
+		let mut new_node: Box<Self>;
+
 		match boolean_type {
 			BooleanAstType::Conjunction => {
 				inverse_type = BooleanAstType::Disjunction;
@@ -408,32 +445,72 @@ impl BooleanAstNode {
 			_ => panic!("cannot distribute '{}' op", boolean_type),
 		}
 		if self.boolean_type != boolean_type { return };
-		match (&self.left, &self.right) {
-			(Some(left), Some(right)) => {
-				if right.boolean_type != inverse_type {
-					if left.boolean_type != inverse_type { return };
-					order_swap = true;
-					std::mem::swap(&mut self.left, &mut self.right);
-				}
-			},
-			_ => {
-				panic!("missing operand for '{}' operation", self.boolean_type);
-			},
-		}
-		if let (Some(left), Some(right)) = (&self.left, &mut self.right) {
-			let mut new_left =
-				Box::new(Self::new(Self::type_to_symbol(boolean_type)));
-			new_left.left = Some(left.clone());
-			std::mem::swap(&mut new_left.right, &mut self.left);
-			right.change_type(boolean_type);
-			std::mem::swap(&mut new_left.right, &mut right.left);
-			if order_swap {
-				std::mem::swap(&mut right.left, &mut right.right);
-				std::mem::swap(&mut new_left.left, &mut new_left.right);
+		println!("\nBEFORE get_operands(): '{}'\n", self.to_formula());
+		let (left_ops, right_ops) = self.get_operands(inverse_type);
+		if left_ops.len() == 0 && right_ops.len() == 0 { return };
+		println!("LEFT_OPS:");
+		for left_op in &left_ops {
+			if let Some(l) = left_op {
+				println!("{}", l.to_formula());
+			} else {
+				println!("None");
 			}
-			self.left = Some(new_left);
 		}
+		println!("RIGHT_OPS:");
+		for right_op in &right_ops {
+			if let Some(r) = right_op {
+				println!("{}", r.to_formula());
+			} else {
+				println!("None");
+			}
+		}
+		println!("\nSTART: '{}'\n{}\n", self.to_formula(), self);
 		self.change_type(inverse_type);
+		let mut new_nodes: Vec<Box<Self>> = vec![];
+		for left_op in &left_ops {
+			for right_op in &right_ops {
+				if let (Some(left), Some(right)) = (left_op, right_op) {
+					println!("left: '{}'\n{}", left.to_formula(), left);
+					println!("right: '{}'\n{}", right.to_formula(), right);
+					new_node = Box::new(
+						Self::new(Self::type_to_symbol(boolean_type))
+					);
+					new_node.left = Some(left.clone());
+					new_node.right = Some(right.clone());
+					new_nodes.push(new_node);
+				} else {
+					panic!("empty option operand");
+				}
+			}
+		}
+		let mut tmp: Box<Self>;
+		let mut new_right: Option<Box<Self>> = None;
+		loop {
+			match new_nodes.len() {
+				0 => panic!("missing nodes"),
+				1 => {
+					std::mem::swap(&mut self.right, &mut new_right);
+					self.left = new_nodes.pop();
+					break;
+				},
+				_ => {
+					match new_right {
+						None => {
+							new_right = new_nodes.pop();
+						},
+						Some(_) => {
+							tmp = Box::new(
+								Self::new(Self::type_to_symbol(inverse_type))
+							);
+							tmp.left = new_nodes.pop();
+							tmp.right = new_right;
+							new_right = Some(tmp);
+						},
+					}
+				},
+			}
+		}
+		println!("END distribute(): '{}'\n\n", self.to_formula());
 	}
 
 	pub fn factor(&mut self, boolean_type: BooleanAstType) {
@@ -739,20 +816,34 @@ impl BooleanAstNode {
 		self.pre_order(Self::replace_junction_negation);
 	}
 
-	fn cnf_op(&mut self) {
-		//TODO: I finally understood, make it so the conjunctions are ONLY on
-		//the right side of the tree (and on the right side of the right side)
-		self.left_rotate_disjunction();
-		self.replace_disjunction();
-		self.right_rotate_conjunction();
-		self.right_rotate_disjunction();
+	fn cnf(&mut self) {
+		match self.boolean_type {
+			BooleanAstType::Variable | BooleanAstType::Negation => (),
+			BooleanAstType::Conjunction | BooleanAstType::Disjunction => {
+				if let (Some(l), Some(r)) = (&mut self.left, &mut self.right) {
+					l.cnf();
+					r.cnf();
+					if self.boolean_type == BooleanAstType::Disjunction {
+						self.distribute(BooleanAstType::Disjunction);
+					} else if l.boolean_type == BooleanAstType::Conjunction {
+						//TODO: probably should 'get_operands' here to fix this
+						self.right_rotate(BooleanAstType::Conjunction);
+					}
+				} else {
+					panic!("missing operand for '{}' operation",
+						self.boolean_type);
+				}
+			},
+			_ => panic!("unexpected op '{}'", self.boolean_type),
+		}
 	}
 
 	pub fn to_cnf(&mut self) {
 		self.to_nnf();
-		self.in_order(Self::cnf_op);
+		self.cnf();
+		/*
 		self.side_order(Self::replace_disjunction, Self::pre_order, true);
-		self.in_order(Self::cnf_op);
+		*/
 	}
 }
 
