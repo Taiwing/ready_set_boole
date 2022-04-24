@@ -832,11 +832,35 @@ impl BooleanAstNode {
 				if let (Some(l), Some(r)) = (&mut self.left, &mut self.right) {
 					l.cnf();
 					r.cnf();
-					if self.boolean_type == BooleanAstType::Disjunction {
-						self.distribute(BooleanAstType::Disjunction);
-					} else if l.boolean_type == BooleanAstType::Conjunction {
-						//TODO: probably should 'get_operands' here to fix this
-						self.right_rotate(BooleanAstType::Conjunction);
+					match (self.boolean_type, l.boolean_type, r.boolean_type) {
+						(BooleanAstType::Disjunction, _, _) => {
+							self.distribute(BooleanAstType::Disjunction);
+						},
+						(
+							BooleanAstType::Conjunction,
+							BooleanAstType::Conjunction,
+							BooleanAstType::Conjunction,
+						) => {
+							let (mut lops, mut rops) =
+								self.get_operands(BooleanAstType::Conjunction);
+							lops.append(&mut rops);
+							let mut ops: Vec<Box<Self>> = vec![];
+							for op in lops {
+								ops.push(op.unwrap());
+							}
+							self.build_right_handed_tree_from_operand_list(
+								ops,
+								BooleanAstType::Conjunction,
+							);
+						},
+						(
+							BooleanAstType::Conjunction,
+							BooleanAstType::Conjunction,
+							_,
+						) => {
+							self.right_rotate(BooleanAstType::Conjunction);
+						},
+						_ => (),
 					}
 				} else {
 					panic!("missing operand for '{}' operation",
@@ -850,9 +874,6 @@ impl BooleanAstNode {
 	pub fn to_cnf(&mut self) {
 		self.to_nnf();
 		self.cnf();
-		/*
-		self.side_order(Self::replace_disjunction, Self::pre_order, true);
-		*/
 	}
 }
 
