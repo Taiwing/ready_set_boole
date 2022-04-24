@@ -95,6 +95,13 @@ fn main() {
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
+
+	formula = "BF|DF|&G!H||BDFIJ||||BDFI|||KL||&&";
+	orig = BooleanAstNode::tree(formula);
+	println!("orig: '{}'\n{}\n", formula, orig);
+	mine = orig.clone();
+	mine.to_cnf();
+	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -692,6 +699,20 @@ mod tests {
 		//assert_eq!("ABC|BD|&&", conjunctive_normal_form(formula));
 
 		formula = "ABCDEFGH>IJKL|&|&|&|&|&";
+		orig = BooleanAstNode::tree(formula);
+		mine = orig.clone();
+		mine.to_cnf();
+		assert_eq!(orig, mine);
+		assert!(mine.conjunctive_normal_form());
+
+		formula = "AB&C|D|EF&&";
+		orig = BooleanAstNode::tree(formula);
+		mine = orig.clone();
+		mine.to_cnf();
+		assert_eq!(orig, mine);
+		assert!(mine.conjunctive_normal_form());
+
+		formula = "BF|DF|&G!H||BDFIJ||||BDFI|||KL||&&";
 		orig = BooleanAstNode::tree(formula);
 		mine = orig.clone();
 		mine.to_cnf();
