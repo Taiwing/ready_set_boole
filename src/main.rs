@@ -758,31 +758,31 @@ mod tests {
 		let mut ast = BooleanAstNode::tree(formula);
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
-		//assert_eq!("A!B!|", conjunctive_normal_form(formula));
+		assert_eq!("A!B!|", conjunctive_normal_form(formula));
 
 		formula = "AB|!";
 		ast = BooleanAstNode::tree(formula);
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
-		//assert_eq!("A!B!&", conjunctive_normal_form(formula));
+		assert_eq!("A!B!&", conjunctive_normal_form(formula));
 
 		formula = "AB|C&";
 		ast = BooleanAstNode::tree(formula);
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
-		//assert_eq!("AB|C&", conjunctive_normal_form(formula));
+		assert_eq!("AB|C&", conjunctive_normal_form(formula));
+
+		formula = "ABCD&|&";
+		ast = BooleanAstNode::tree(formula);
+		ast.to_cnf();
+		assert!(ast.conjunctive_normal_form());
+		assert_eq!("ABC|BD|&&", conjunctive_normal_form(formula));
 
 		formula = "AB|C|D|";
 		ast = BooleanAstNode::tree(formula);
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
 		//assert_eq!("ABCD|||", conjunctive_normal_form(formula));
-
-		formula = "ABCD&|&";
-		ast = BooleanAstNode::tree(formula);
-		ast.to_cnf();
-		assert!(ast.conjunctive_normal_form());
-		//assert_eq!("ABC|BD|&&", conjunctive_normal_form(formula));
 	}
 
 	#[test]
