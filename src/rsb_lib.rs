@@ -644,7 +644,7 @@ impl BooleanAstNode {
 		}
 	}
 
-	fn cnf_check(&self, mut accept_conjunctions: bool) -> bool {
+	fn cnf_check(&self, accept_conjunctions: bool) -> bool {
 		match (self.boolean_type, accept_conjunctions) {
 			(BooleanAstType::Conjunction, true) => {
 				if let (Some(left), Some(right)) = (&self.left, &self.right) {
