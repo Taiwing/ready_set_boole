@@ -294,6 +294,19 @@ impl BooleanAstNode {
 		}
 	}
 
+	/*
+	pub fn one_sided_pre_order(&mut self, op: impl Fn(&mut Self) + Copy, is_left: bool) {
+		if let Some(left_node) = &mut self.left {
+			if is_left { op(left_node); };
+			left_node.one_sided_pre_order(op, is_left);
+		}
+		if let Some(right_node) = &mut self.right {
+			if is_left == false {  op(right_node); };
+			right_node.one_sided_pre_order(op, is_left);
+		}
+	}
+	*/
+
 	pub fn in_order(&mut self, op: impl Fn(&mut Self) + Copy) {
 		if let Some(left_node) = &mut self.left {
 			left_node.in_order(op);
@@ -312,6 +325,24 @@ impl BooleanAstNode {
 			right_node.post_order(op);
 		}
 		op(self);
+	}
+
+	pub fn side_order<F: Fn(&mut Self) + Copy>(&mut self, op: F,
+		order: impl Fn(&mut Self, F) + Copy, is_left: bool) {
+		if let Some(left_node) = &mut self.left {
+			if is_left {
+				order(left_node, op);
+			} else {
+				left_node.side_order(op, order, is_left);
+			}
+		}
+		if let Some(right_node) = &mut self.right {
+			if is_left == false {
+				order(right_node, op);
+			} else {
+				right_node.side_order(op, order, is_left);
+			}
+		}
 	}
 
 	pub fn is_valid_rotation(&self, boolean_type: BooleanAstType, is_left: bool) -> bool {
@@ -575,6 +606,11 @@ impl BooleanAstNode {
 		self.factor(BooleanAstType::Conjunction);
 	}
 
+	pub fn replace_conjunction(&mut self) {
+		self.distribute(BooleanAstType::Conjunction);
+		self.factor(BooleanAstType::Disjunction);
+	}
+
 	pub fn left_rotate_disjunction(&mut self) {
 		self.left_rotate(BooleanAstType::Disjunction);
 	}
@@ -714,6 +750,8 @@ impl BooleanAstNode {
 
 	pub fn to_cnf(&mut self) {
 		self.to_nnf();
+		self.in_order(Self::cnf_op);
+		self.side_order(Self::replace_disjunction, Self::pre_order, true);
 		self.in_order(Self::cnf_op);
 	}
 }

@@ -102,6 +102,41 @@ fn main() {
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
+
+	formula = "BF&DF&&G!H||BDFIJ||||BDFI|||KL||&&";
+	orig = BooleanAstNode::tree(formula);
+	println!("orig: '{}'\n{}\n", formula, orig);
+	mine = orig.clone();
+	mine.to_cnf();
+	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
+
+	formula = "BF|DF|&G!H&|BDFIJ||||BDFI|||KL||&&";
+	orig = BooleanAstNode::tree(formula);
+	println!("orig: '{}'\n{}\n", formula, orig);
+	mine = orig.clone();
+	mine.to_cnf();
+	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
+
+	formula = "BF|DF|&G!H|&BDFIJ||||BDFI|||KL||&&";
+	orig = BooleanAstNode::tree(formula);
+	println!("orig: '{}'\n{}\n", formula, orig);
+	mine = orig.clone();
+	mine.to_cnf();
+	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
+
+	formula = "BF&DF&&G!H&&BDFIJ&&&&BDFI|||KL||&&";
+	orig = BooleanAstNode::tree(formula);
+	println!("orig: '{}'\n{}\n", formula, orig);
+	mine = orig.clone();
+	mine.to_cnf();
+	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
+
+	formula = "BF&DF&&G!H&&BDFIJ&&&&BDFI&||KL||&&";
+	orig = BooleanAstNode::tree(formula);
+	println!("orig: '{}'\n{}\n", formula, orig);
+	mine = orig.clone();
+	mine.to_cnf();
+	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -690,40 +725,24 @@ mod tests {
 
 	#[test]
 	fn cnf_harder_tests() {
-		let mut formula = "ABCDE&||&";
-		let mut orig = BooleanAstNode::tree(formula);
-		let mut mine = orig.clone();
-		mine.to_cnf();
-		assert_eq!(orig, mine);
-		assert!(mine.conjunctive_normal_form());
-		//assert_eq!("ABC|BD|&&", conjunctive_normal_form(formula));
+		fn cnf_hard_test(formula: &str) {
+			let mut formula = "ABCDE&||&";
+			let mut orig = BooleanAstNode::tree(formula);
+			let mut mine = orig.clone();
+			mine.to_cnf();
+			assert_eq!(orig, mine);
+			assert!(mine.conjunctive_normal_form());
+		}
 
-		formula = "ABCDEFGH>IJKL|&|&|&|&|&";
-		orig = BooleanAstNode::tree(formula);
-		mine = orig.clone();
-		mine.to_cnf();
-		assert_eq!(orig, mine);
-		assert!(mine.conjunctive_normal_form());
-
-		formula = "AB&C|D|EF&&";
-		orig = BooleanAstNode::tree(formula);
-		mine = orig.clone();
-		mine.to_cnf();
-		assert_eq!(orig, mine);
-		assert!(mine.conjunctive_normal_form());
-
-		formula = "BF|DF|&G!H||BDFIJ||||BDFI|||KL||&&";
-		orig = BooleanAstNode::tree(formula);
-		mine = orig.clone();
-		mine.to_cnf();
-		assert_eq!(orig, mine);
-		assert!(mine.conjunctive_normal_form());
-
-		formula = "ABC|BD|E|BD&F|G!H||BDF||I|J|BDFI|||KL||&&&&&";
-		orig = BooleanAstNode::tree(formula);
-		mine = orig.clone();
-		mine.to_cnf();
-		assert_eq!(orig, mine);
-		assert!(mine.conjunctive_normal_form());
+		cnf_hard_test("ABCDE&||&");
+		cnf_hard_test("ABCDEFGH>IJKL|&|&|&|&|&");
+		cnf_hard_test("AB&C|D|EF&&");
+		cnf_hard_test("BF|DF|&G!H||BDFIJ||||BDFI|||KL||&&");
+		cnf_hard_test("ABC|BD|E|BD&F|G!H||BDF||I|J|BDFI|||KL||&&&&&");
+		cnf_hard_test("BF&DF&&G!H&&BDFIJ&&&&BDFI|||KL||&&");
+		cnf_hard_test("BF&DF&&G!H&&BDFIJ&&&&BDFI&||KL||&&");
+		cnf_hard_test("BF&DF&&G!H&&BDFIJ&&&&BDFI&&|KL||&&");
+		cnf_hard_test("BF&DF&&G!H&&BDFIJ&&&&BDFI&&&KL||&&");
+		cnf_hard_test("BF&DF&&G!H&&BDFIJ&&&&BDFI&&&KL&|&&");
 	}
 }
