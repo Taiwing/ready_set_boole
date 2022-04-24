@@ -480,33 +480,13 @@ impl BooleanAstNode {
 			_ => panic!("cannot distribute '{}' op", boolean_type),
 		}
 		if self.boolean_type != boolean_type { return };
-		println!("\nBEFORE get_operands(): '{}'\n", self.to_formula());
 		let (left_ops, right_ops) = self.get_operands(inverse_type);
 		if left_ops.len() == 0 && right_ops.len() == 0 { return };
-		println!("LEFT_OPS:");
-		for left_op in &left_ops {
-			if let Some(l) = left_op {
-				println!("{}", l.to_formula());
-			} else {
-				println!("None");
-			}
-		}
-		println!("RIGHT_OPS:");
-		for right_op in &right_ops {
-			if let Some(r) = right_op {
-				println!("{}", r.to_formula());
-			} else {
-				println!("None");
-			}
-		}
-		println!("\nSTART: '{}'\n{}\n", self.to_formula(), self);
 		self.change_type(inverse_type);
 		let mut new_nodes: Vec<Box<Self>> = vec![];
 		for left_op in &left_ops {
 			for right_op in &right_ops {
 				if let (Some(left), Some(right)) = (left_op, right_op) {
-					println!("left: '{}'\n{}", left.to_formula(), left);
-					println!("right: '{}'\n{}", right.to_formula(), right);
 					new_node = Box::new(
 						Self::new(Self::type_to_symbol(boolean_type))
 					);
@@ -519,7 +499,6 @@ impl BooleanAstNode {
 			}
 		}
 		self.build_right_handed_tree_from_operand_list(new_nodes, inverse_type);
-		println!("END distribute(): '{}'\n\n", self.to_formula());
 	}
 
 	pub fn factor(&mut self, boolean_type: BooleanAstType) {
