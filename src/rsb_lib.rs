@@ -390,7 +390,7 @@ impl BooleanAstNode {
 
 	fn get_operands(
 		&mut self,
-		inverse_type: BooleanAstType,
+		target_type: BooleanAstType,
 	) -> (Vec<Option<Box<Self>>>, Vec<Option<Box<Self>>>) {
 		let mut node: Option<Box<Self>>;
 		let mut left_operands: Vec<Option<Box<Self>>> = vec![];
@@ -398,27 +398,27 @@ impl BooleanAstNode {
 
 		match (&mut self.left, &mut self.right) {
 			(Some(l), Some(r)) => {
-				if self.boolean_type != inverse_type
-					&& l.boolean_type != inverse_type
-					&& r.boolean_type != inverse_type {
+				if self.boolean_type != target_type
+					&& l.boolean_type != target_type
+					&& r.boolean_type != target_type {
 					return (left_operands, right_operands);
 				}
-				if l.boolean_type != inverse_type {
+				if l.boolean_type != target_type {
 					node = None;
 					std::mem::swap(&mut node, &mut self.left);
 					left_operands.push(node);
 				} else {
-					let (mut lvec, mut rvec) = l.get_operands(inverse_type);
+					let (mut lvec, mut rvec) = l.get_operands(target_type);
 					left_operands.append(&mut lvec);
 					left_operands.append(&mut rvec);
 					self.left = None;
 				}
-				if r.boolean_type != inverse_type {
+				if r.boolean_type != target_type {
 					node = None;
 					std::mem::swap(&mut node, &mut self.right);
 					right_operands.push(node);
 				} else {
-					let (mut lvec, mut rvec) = r.get_operands(inverse_type);
+					let (mut lvec, mut rvec) = r.get_operands(target_type);
 					right_operands.append(&mut lvec);
 					right_operands.append(&mut rvec);
 					self.right = None;
