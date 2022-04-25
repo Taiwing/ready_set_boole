@@ -827,29 +827,18 @@ impl BoolNode {
 				if let (Some(l), Some(r)) = (&mut self.left, &mut self.right) {
 					l.cnf();
 					r.cnf();
-					match (self.boolean_type, l.boolean_type, r.boolean_type) {
-						(BoolType::Disjunction, _, _) => {
-							self.distribute(BoolType::Disjunction);
-							if self.boolean_type != BoolType::Disjunction {
-								return
-							}
-							let ops = self.get_operands(BoolType::Disjunction);
-							for op in ops { operands.push(op.unwrap()); }
-							self.build_right_handed_tree_from_operand_list(
-								operands,
-								BoolType::Disjunction,
-							);
-						},
-						(BoolType::Conjunction, _, _) => {
-							let ops = self.get_operands(BoolType::Conjunction);
-							for op in ops { operands.push(op.unwrap()); }
-							self.build_right_handed_tree_from_operand_list(
-								operands,
-								BoolType::Conjunction,
-							);
-						},
-						_ => (),
+					if self.boolean_type == BoolType::Disjunction {
+						self.distribute(BoolType::Disjunction);
+						if self.boolean_type != BoolType::Disjunction {
+							return
+						}
 					}
+					let ops = self.get_operands(self.boolean_type);
+					for op in ops { operands.push(op.unwrap()); }
+					self.build_right_handed_tree_from_operand_list(
+						operands,
+						self.boolean_type,
+					);
 				} else {
 					panic!("missing operand for '{}' operation",
 						self.boolean_type);
