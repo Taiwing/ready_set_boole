@@ -1,5 +1,7 @@
 mod rsb_lib;
 use rsb_lib::*;
+mod utils;
+use utils::{ast::*, truth::{self, eval_formula}};
 use gray_codes::GrayCode32;
 
 fn main() {
@@ -224,8 +226,8 @@ fn gray_code_diff(n: u32) {
 }
 
 fn truth_diff(left: &str, right: &str) {
-	match (truth_table::<std::io::Stdout>(left, None),
-		truth_table::<std::io::Stdout>(right, None)) {
+	match (truth::table::<std::io::Stdout>(left, None),
+		truth::table::<std::io::Stdout>(right, None)) {
 		(Some(left_truth), Some(right_truth)) => {
 			println!("left:\t\t'{}'\n{}", left, left_truth);
 			println!("right:\t'{}'\n{}", right, right_truth);
@@ -406,23 +408,23 @@ mod tests {
 			| 1 | 1 | 0 | 1 |\n\
 			| 1 | 1 | 1 | 1 |\n\
 		";
-		if let Some(truth) = truth_table::<std::io::Stdout>("AB&C|", None) {
+		if let Some(truth) = truth::table::<std::io::Stdout>("AB&C|", None) {
 			assert_eq!(truth, expected);
 		} else {
-			panic!("no output string for truth_table function");
+			panic!("no output string for truth::table function");
 		}
 	}
 
     #[test]
     #[should_panic(expected = "formula string is empty")]
     fn truth_table_empty_string() {
-        truth_table::<std::io::Stdout>("", None);
+        truth::table::<std::io::Stdout>("", None);
     }
 
     #[test]
     #[should_panic(expected = "'1' is not a valid op")]
     fn truth_table_boolean_value() {
-        truth_table::<std::io::Stdout>("100&Z!", None);
+        truth::table::<std::io::Stdout>("100&Z!", None);
     }
 
 	#[test]
