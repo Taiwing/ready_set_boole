@@ -106,13 +106,12 @@ pub fn table<W: Write>(
     keys.sort();
     keys.rotate_left(1);
     write_truth(&mut table, &mut writer, build_truth(&varmap, &keys, true));
-    loop {
+    while values < values_max {
         set_values(&mut varmap, &keys, values);
         find_truth(formula, &mut varmap);
         let truth = build_truth(&varmap, &keys, false);
 		write_truth(&mut table, &mut writer, truth);
         values = values + 1;
-        if values == values_max { break; }
     };
 	if let Some(_) = writer {
 		None
@@ -140,12 +139,11 @@ pub fn sat(formula: &str) -> bool {
     keys.push('=');
     keys.sort();
     keys.rotate_left(1);
-    loop {
+    while values < values_max {
         set_values(&mut varmap, &keys, values);
         find_truth(formula, &mut varmap);
         if *varmap.get(&'=').unwrap() { return true };
         values = values + 1;
-        if values == values_max { break; }
     };
 	false
 }
