@@ -1,5 +1,5 @@
 mod rsb_lib;
-use crate::rsb_lib::*;
+use rsb_lib::*;
 use gray_codes::GrayCode32;
 
 fn main() {
