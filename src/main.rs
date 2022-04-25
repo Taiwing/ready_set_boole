@@ -1,7 +1,7 @@
 mod rsb_lib;
 use rsb_lib::*;
 mod utils;
-use utils::{ast::*, truth::{self, eval_formula, sat}};
+use utils::{ast::*, truth::{self, eval_formula, sat}, sets::*};
 use gray_codes::GrayCode32;
 
 fn main() {
@@ -168,7 +168,6 @@ fn main() {
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
-	*/
 
 	let mut formula = "AB&CD||";
 	let mut orig = BoolNode::tree(formula);
@@ -200,6 +199,7 @@ fn main() {
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine.to_cnf(): '{}'\n{}\n", mine.to_formula(), mine);
+	*/
 	*/
 }
 
@@ -837,5 +837,43 @@ mod tests {
 		assert_eq!(sat("AB&"), true);
 		assert_eq!(sat("AA!&"), false);
 		assert_eq!(sat("AA^"), false);
+	}
+
+	#[test]
+	fn powerset_basics() {
+		let input: Vec<i32> = vec![];
+		let pow = powerset(&input);
+		assert_eq!(pow.len(), 2usize.pow(input.len() as u32));
+
+		let input: Vec<i32> = vec![0];
+		let pow = powerset(&input);
+		assert_eq!(pow.len(), 2usize.pow(input.len() as u32));
+
+		let input: Vec<i32> = vec![0, 1];
+		let pow = powerset(&input);
+		assert_eq!(pow.len(), 2usize.pow(input.len() as u32));
+
+		let input: Vec<i32> = vec![0, 1, 2];
+		let pow = powerset(&input);
+		assert_eq!(pow.len(), 2usize.pow(input.len() as u32));
+
+		let input: Vec<i32> = vec![0, 1, 2, 3];
+		let pow = powerset(&input);
+		assert_eq!(pow.len(), 2usize.pow(input.len() as u32));
+
+		let input: Vec<i32> = vec![0, 1, 2, 3, 4];
+		let pow = powerset(&input);
+		assert_eq!(pow.len(), 2usize.pow(input.len() as u32));
+
+		let input: Vec<i32> = (0..10).collect();
+		let pow = powerset(&input);
+		assert_eq!(pow.len(), 2usize.pow(input.len() as u32));
+	}
+
+	#[test]
+	#[should_panic(expected = "input is waaaaay too big, please calm down")]
+	fn powerset_big_input() {
+		let input: Vec<i32> = (0..128).collect();
+		let pow = powerset(&input);
 	}
 }
