@@ -778,6 +778,12 @@ mod tests {
 		assert!(ast.conjunctive_normal_form());
 		assert_eq!("ABCD|||", conjunctive_normal_form(formula));
 
+		formula = "AB&C&D&";
+		ast = BoolNode::tree(formula);
+		ast.to_cnf();
+		assert!(ast.conjunctive_normal_form());
+		assert_eq!("ABCD&&&", conjunctive_normal_form(formula));
+
 		formula = "ABCD&|&";
 		ast = BoolNode::tree(formula);
 		ast.to_cnf();

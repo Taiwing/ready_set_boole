@@ -431,8 +431,17 @@ impl BoolNode {
 		(left_operands, right_operands)
 	}
 
-	fn get_operands(&mut self, target_type: BoolType) -> Vec<Option<Box<Self>>> {
+	fn get_operands(
+		&mut self,
+		target_type: BoolType
+	) -> Vec<Option<Box<Self>>> {
 		let mut operands: Vec<Option<Box<Self>>> = vec![];
+
+		if self.boolean_type == target_type {
+			let (mut lvec, mut rvec) = self.get_lr_operands(target_type);
+			operands.append(&mut lvec);
+			operands.append(&mut rvec);
+		}
 		operands
 	}
 
@@ -810,6 +819,8 @@ impl BoolNode {
 	}
 
 	fn cnf(&mut self) {
+		let mut operands: Vec<Box<Self>> = vec![];
+
 		match self.boolean_type {
 			BoolType::Variable | BoolType::Negation => (),
 			BoolType::Conjunction | BoolType::Disjunction => {
@@ -819,30 +830,23 @@ impl BoolNode {
 					match (self.boolean_type, l.boolean_type, r.boolean_type) {
 						(BoolType::Disjunction, _, _) => {
 							self.distribute(BoolType::Disjunction);
-						},
-						(
-							BoolType::Conjunction,
-							BoolType::Conjunction,
-							BoolType::Conjunction,
-						) => {
-							let (mut lops, mut rops) =
-								self.get_lr_operands(BoolType::Conjunction);
-							lops.append(&mut rops);
-							let mut ops: Vec<Box<Self>> = vec![];
-							for op in lops {
-								ops.push(op.unwrap());
+							if self.boolean_type != BoolType::Disjunction {
+								return
 							}
+							let ops = self.get_operands(BoolType::Disjunction);
+							for op in ops { operands.push(op.unwrap()); }
 							self.build_right_handed_tree_from_operand_list(
-								ops,
-								BoolType::Conjunction,
+								operands,
+								BoolType::Disjunction,
 							);
 						},
-						(
-							BoolType::Conjunction,
-							BoolType::Conjunction,
-							_,
-						) => {
-							self.right_rotate(BoolType::Conjunction);
+						(BoolType::Conjunction, _, _) => {
+							let ops = self.get_operands(BoolType::Conjunction);
+							for op in ops { operands.push(op.unwrap()); }
+							self.build_right_handed_tree_from_operand_list(
+								operands,
+								BoolType::Conjunction,
+							);
 						},
 						_ => (),
 					}
