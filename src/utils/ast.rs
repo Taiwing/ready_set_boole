@@ -236,12 +236,6 @@ impl BoolNode {
 		}
 	}
 
-	pub fn consume(
-		mut self
-	) -> (BoolType, char, Option<Box<Self>>, Option<Box<Self>>) {
-		(self.boolean_type, self.op_symbol, self.left, self.right)
-	}
-
 	fn get_lr_operands(
 		&mut self,
 		target_type: BoolType,
