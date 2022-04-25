@@ -1,7 +1,7 @@
 mod rsb_lib;
 use rsb_lib::*;
 mod utils;
-use utils::{ast::*, truth::{self, eval_formula}};
+use utils::{ast::*, truth::{self, eval_formula, sat}};
 use gray_codes::GrayCode32;
 
 fn main() {
@@ -829,5 +829,13 @@ mod tests {
 		cnf_hard_test("BF&DF&&G!H&&BDFIJ&&&&BDFI&&|KL||&&");
 		cnf_hard_test("BF&DF&&G!H&&BDFIJ&&&&BDFI&&&KL||&&");
 		cnf_hard_test("BF&DF&&G!H&&BDFIJ&&&&BDFI&&&KL&|&&");
+	}
+
+	#[test]
+	fn sat_subject_tests() {
+		assert_eq!(sat("AB|"), true);
+		assert_eq!(sat("AB&"), true);
+		assert_eq!(sat("AA!&"), false);
+		assert_eq!(sat("AA^"), false);
 	}
 }

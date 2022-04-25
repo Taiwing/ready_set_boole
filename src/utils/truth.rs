@@ -114,5 +114,38 @@ pub fn table<W: Write>(
         values = values + 1;
         if values == values_max { break; }
     };
-	Some(table)
+	if let Some(_) = writer {
+		None
+	} else {
+		Some(table)
+	}
+}
+
+pub fn sat(formula: &str) -> bool {
+    let mut varmap: HashMap<char, bool> = HashMap::with_capacity(27);
+    let mut keys: Vec<char> = Vec::with_capacity(27);
+    let mut values: u32 = 0;
+
+    for c in formula.chars() {
+        match c {
+            'A'..='Z' => {
+                if varmap.insert(c, false) == None { keys.push(c); }
+            },
+            '0' | '1' => panic!("'{}' is not a valid op", c),
+            _ => (),
+        }
+    }
+    let values_max: u32 = 1 << keys.len();
+    varmap.insert('=', false);
+    keys.push('=');
+    keys.sort();
+    keys.rotate_left(1);
+    loop {
+        set_values(&mut varmap, &keys, values);
+        find_truth(formula, &mut varmap);
+        if *varmap.get(&'=').unwrap() { return true };
+        values = values + 1;
+        if values == values_max { break; }
+    };
+	false
 }
