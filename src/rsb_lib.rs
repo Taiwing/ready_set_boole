@@ -821,28 +821,30 @@ impl BoolNode {
 	fn cnf(&mut self) {
 		let mut operands: Vec<Box<Self>> = vec![];
 
-		match self.boolean_type {
-			BoolType::Variable | BoolType::Negation => (),
-			BoolType::Conjunction | BoolType::Disjunction => {
-				if let (Some(l), Some(r)) = (&mut self.left, &mut self.right) {
-					l.cnf();
-					r.cnf();
-					if self.boolean_type == BoolType::Disjunction {
-						self.distribute(BoolType::Disjunction);
-						if self.boolean_type != BoolType::Disjunction {
-							return
-						}
+		match (self.boolean_type, &mut self.left, &mut self.right) {
+			(BoolType::Variable | BoolType::Negation, _, _) => (),
+			(
+				BoolType::Conjunction | BoolType::Disjunction,
+				Some(l),
+				Some(r)
+			) => {
+				l.cnf();
+				r.cnf();
+				if self.boolean_type == BoolType::Disjunction {
+					self.distribute(BoolType::Disjunction);
+					if self.boolean_type != BoolType::Disjunction {
+						return
 					}
-					let ops = self.get_operands(self.boolean_type);
-					for op in ops { operands.push(op.unwrap()); }
-					self.build_right_handed_tree_from_operand_list(
-						operands,
-						self.boolean_type,
-					);
-				} else {
-					panic!("missing operand for '{}' operation",
-						self.boolean_type);
 				}
+				let ops = self.get_operands(self.boolean_type);
+				for op in ops { operands.push(op.unwrap()); }
+				self.build_right_handed_tree_from_operand_list(
+					operands,
+					self.boolean_type,
+				);
+			},
+			(BoolType::Conjunction | BoolType::Disjunction, _, _) => {
+				panic!("missing operand for '{}' operation", self.boolean_type);
 			},
 			_ => panic!("unexpected op '{}'", self.boolean_type),
 		}
