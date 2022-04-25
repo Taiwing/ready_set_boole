@@ -876,4 +876,38 @@ mod tests {
 		let input: Vec<i32> = (0..128).collect();
 		let pow = powerset(&input);
 	}
+
+	#[test]
+	fn eval_set_subject_tests() {
+		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 3, 4]];
+		let result = eval_set("AB&", &sets);
+		assert_eq!(result, vec![0]);
+
+		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![3, 4, 5]];
+		let result = eval_set("AB|", &sets);
+		assert_eq!(result, vec![0, 1, 2, 3, 4, 5]);
+
+		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2]];
+		let result = eval_set("A!", &sets);
+		assert_eq!(result, vec![]);
+	}
+
+	#[test]
+	fn eval_set_other_ops() {
+		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 3, 4]];
+		let result = eval_set("AB^", &sets);
+		assert_eq!(result, vec![1, 2, 3, 4]);
+
+		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 3, 4]];
+		let result = eval_set("AB>", &sets);
+		assert_eq!(result, vec![0, 3, 4]);
+
+		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 3, 4]];
+		let result = eval_set("AB=", &sets);
+		assert_eq!(result, vec![]);
+
+		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 1, 2]];
+		let result = eval_set("AB=", &sets);
+		assert_eq!(result, vec![0, 1, 2]);
+	}
 }
