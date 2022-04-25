@@ -44,6 +44,8 @@ fn build_varmap(formula: &str, sets: &[Vec<i32>]) -> HashMap<char, Vec<i32>> {
 	keys.sort();
 	if keys.len() > sets.len() {
 		panic!("missing set operands for '{}' formula", formula);
+	} else if sets.len() > keys.len() {
+		panic!("too many set operands for '{}' formula", formula);
 	}
 	for c in keys {
 		let mut set = sets[index].clone();
@@ -52,6 +54,18 @@ fn build_varmap(formula: &str, sets: &[Vec<i32>]) -> HashMap<char, Vec<i32>> {
 		index += 1;
 	}
 	varmap
+}
+
+fn set_complement(a: &Vec<i32>, u: &Vec<i32>) -> Vec<i32> {
+	let mut result: Vec<i32> = vec![];
+
+	for element in u {
+		if a.contains(element) == false {
+			result.push(*element);
+		}
+	}
+	result.sort();
+	result
 }
 
 fn set_intersection(a: &Vec<i32>, b: &Vec<i32>) -> Vec<i32> {
@@ -96,10 +110,8 @@ fn set_xor(a: &Vec<i32>, b: &Vec<i32>) -> Vec<i32> {
 	result
 }
 
-fn set_implication(b: &Vec<i32>) -> Vec<i32> {
-	let mut result = b.clone();
-	result.sort();
-	result
+fn set_implication(a: &Vec<i32>, b: &Vec<i32>, u: &Vec<i32>) -> Vec<i32> {
+	set_union(&set_complement(a, u), b)
 }
 
 fn set_equal(a: &Vec<i32>, b: &Vec<i32>) -> Vec<i32> {
@@ -114,6 +126,7 @@ fn set_equal(a: &Vec<i32>, b: &Vec<i32>) -> Vec<i32> {
 }
 
 pub fn eval_set(formula: &str, sets: &[Vec<i32>]) -> Vec<i32> {
+	let mut u: Vec<i32> = Vec::new();
     let mut stack: Vec<Vec<i32>> = Vec::new();
 	let variables: String = ('A'..='Z').collect();
 
@@ -121,6 +134,14 @@ pub fn eval_set(formula: &str, sets: &[Vec<i32>]) -> Vec<i32> {
         panic!("formula string is empty");
     }
 	let varmap = build_varmap(formula, sets);
+	for set in sets {
+		for element in set {
+			if u.contains(element) == false {
+				u.push(*element);
+			}
+		}
+	}
+	u.sort();
     for op in formula.chars() {
         let right = if op == '!' || variables.contains(op) {
 			None
@@ -132,11 +153,11 @@ pub fn eval_set(formula: &str, sets: &[Vec<i32>]) -> Vec<i32> {
             ('A'..='Z', None, None) => {
 				stack.push(varmap.get(&op).unwrap().clone())
 			},
-            ('!', Some(_), None) => stack.push(vec![]),
+            ('!', Some(a), None) => stack.push(set_complement(&a, &u)),
             ('&', Some(a), Some(b)) => stack.push(set_intersection(&a, &b)),
             ('|', Some(a), Some(b)) => stack.push(set_union(&a, &b)),
             ('^', Some(a), Some(b)) => stack.push(set_xor(&a, &b)),
-            ('>', Some(_), Some(b)) => stack.push(set_implication(&b)),
+            ('>', Some(a), Some(b)) => stack.push(set_implication(&a, &b, &u)),
             ('=', Some(a), Some(b)) => stack.push(set_equal(&a, &b)),
             _ => panic!("'{}' is not a valid op or is missing an argument", op),
         }

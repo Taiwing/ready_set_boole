@@ -898,13 +898,25 @@ mod tests {
 		let result = eval_set("AB^", &sets);
 		assert_eq!(result, vec![1, 2, 3, 4]);
 
+		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2, 5], vec![0, 3, 4, 5, 6]];
+		let result = eval_set("AB^!", &sets);
+		assert_eq!(result, vec![0, 5]);
+
 		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 3, 4]];
 		let result = eval_set("AB>", &sets);
 		assert_eq!(result, vec![0, 3, 4]);
 
 		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 3, 4]];
-		let result = eval_set("AB=", &sets);
-		assert_eq!(result, vec![]);
+		let result = eval_set("AB>!", &sets);
+		assert_eq!(result, vec![1, 2]);
+
+		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 1, 2], vec![55]];
+		let result = eval_set("AB=CC^|", &sets);
+		assert_eq!(result, vec![0, 1, 2]);
+
+		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 1, 2], vec![55]];
+		let result = eval_set("AB=CC^|!", &sets);
+		assert_eq!(result, vec![55]);
 
 		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 1, 2]];
 		let result = eval_set("AB=", &sets);
