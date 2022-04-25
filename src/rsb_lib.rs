@@ -148,7 +148,7 @@ pub fn print_truth_table(formula: &str) {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum BooleanAstType {
+pub enum BoolType {
 	Variable,
 	Negation,
 	Conjunction,
@@ -158,27 +158,27 @@ pub enum BooleanAstType {
 	LogicalEquivalence,
 }
 
-impl fmt::Display for BooleanAstType {
+impl fmt::Display for BoolType {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		write!(f, "{:?}", self)
 	}
 }
 
 #[derive(Debug)]
-pub struct BooleanAstNode {
-	boolean_type: BooleanAstType,
+pub struct BoolNode {
+	boolean_type: BoolType,
 	op_symbol: char,
 	left: Option<Box<Self>>,
 	right: Option<Box<Self>>,
 }
 
-impl fmt::Display for BooleanAstNode {
+impl fmt::Display for BoolNode {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		write!(f, "{}", self.tree_string())
 	}
 }
 
-impl Clone for BooleanAstNode {
+impl Clone for BoolNode {
 	fn clone(&self) -> Self {
 		let mut ast = Self::new(self.op_symbol);
 		if let Some(left_node) = &self.left {
@@ -191,7 +191,7 @@ impl Clone for BooleanAstNode {
 	}
 }
 
-impl PartialEq for BooleanAstNode {
+impl PartialEq for BoolNode {
 	/// This is not the smartest way to do this, but it was already done lol
 	fn eq(&self, other: &Self) -> bool {
 		let left_formula = self.to_formula();
@@ -207,37 +207,37 @@ impl PartialEq for BooleanAstNode {
 	}
 }
 
-impl Eq for BooleanAstNode {}
+impl Eq for BoolNode {}
 
-impl BooleanAstNode {
-	fn symbol_to_type(c: char) -> BooleanAstType {
+impl BoolNode {
+	fn symbol_to_type(c: char) -> BoolType {
 		match c {
-			'A' ..='Z' => BooleanAstType::Variable,
-			'!' => BooleanAstType::Negation,
-			'&' => BooleanAstType::Conjunction,
-			'|' => BooleanAstType::Disjunction,
-			'^' => BooleanAstType::ExclusiveDisjunction,
-			'>' => BooleanAstType::MaterialCondition,
-			'=' => BooleanAstType::LogicalEquivalence,
+			'A' ..='Z' => BoolType::Variable,
+			'!' => BoolType::Negation,
+			'&' => BoolType::Conjunction,
+			'|' => BoolType::Disjunction,
+			'^' => BoolType::ExclusiveDisjunction,
+			'>' => BoolType::MaterialCondition,
+			'=' => BoolType::LogicalEquivalence,
 			_ => panic!("'{}' is not a valid op", c),
 		}
 	}
 
-	fn type_to_symbol(boolean_type: BooleanAstType) -> char {
+	fn type_to_symbol(boolean_type: BoolType) -> char {
 		match boolean_type {
-			BooleanAstType::Negation => '!',
-			BooleanAstType::Conjunction => '&',
-			BooleanAstType::Disjunction => '|',
-			BooleanAstType::ExclusiveDisjunction => '^',
-			BooleanAstType::MaterialCondition => '>',
-			BooleanAstType::LogicalEquivalence => '=',
-			BooleanAstType::Variable => {
+			BoolType::Negation => '!',
+			BoolType::Conjunction => '&',
+			BoolType::Disjunction => '|',
+			BoolType::ExclusiveDisjunction => '^',
+			BoolType::MaterialCondition => '>',
+			BoolType::LogicalEquivalence => '=',
+			BoolType::Variable => {
 				panic!("no predefined symbol for '{}' type", boolean_type);
 			},
 		}
 	}
 
-	fn change_type(&mut self, new_type: BooleanAstType) {
+	fn change_type(&mut self, new_type: BoolType) {
 		self.boolean_type = new_type;
 		self.op_symbol = Self::type_to_symbol(new_type);
 	}
@@ -259,8 +259,8 @@ impl BooleanAstNode {
 
 	fn init_children<T: Iterator<Item = char>>(&mut self, formula: &mut T) {
 		match self.boolean_type {
-			BooleanAstType::Variable => (),
-			BooleanAstType::Negation => {
+			BoolType::Variable => (),
+			BoolType::Negation => {
 				self.left = Some(self.init_child(formula));
 			},
 			_ => {
@@ -332,17 +332,17 @@ impl BooleanAstNode {
 		}
 	}
 
-	pub fn is_valid_rotation(&self, boolean_type: BooleanAstType, is_left: bool) -> bool {
+	pub fn is_valid_rotation(&self, boolean_type: BoolType, is_left: bool) -> bool {
 		match boolean_type {
-			BooleanAstType::Variable => {
+			BoolType::Variable => {
 				panic!("cannot rotate '{}' node because it has no operand",
 					boolean_type);
 			},
-			BooleanAstType::Negation => {
+			BoolType::Negation => {
 				panic!("cannot rotate '{}' node because it only has 1 operand",
 					boolean_type);
 			},
-			BooleanAstType::MaterialCondition => {
+			BoolType::MaterialCondition => {
 				panic!("cannot rotate '{}' node because it is non-commutative",
 					boolean_type);
 			},
@@ -360,7 +360,7 @@ impl BooleanAstNode {
 		}
 	}
 
-	pub fn right_rotate(&mut self, boolean_type: BooleanAstType) {
+	pub fn right_rotate(&mut self, boolean_type: BoolType) {
 		if self.is_valid_rotation(boolean_type, false) == false { return };
 		std::mem::swap(&mut self.left, &mut self.right);
 		if let Some(right) = &mut self.right {
@@ -371,7 +371,7 @@ impl BooleanAstNode {
 		}
 	}
 
-	pub fn left_rotate(&mut self, boolean_type: BooleanAstType) {
+	pub fn left_rotate(&mut self, boolean_type: BoolType) {
 		if self.is_valid_rotation(boolean_type, true) == false { return };
 		std::mem::swap(&mut self.left, &mut self.right);
 		if let Some(left) = &mut self.left {
@@ -384,13 +384,13 @@ impl BooleanAstNode {
 
 	pub fn consume(
 		mut self
-	) -> (BooleanAstType, char, Option<Box<Self>>, Option<Box<Self>>) {
+	) -> (BoolType, char, Option<Box<Self>>, Option<Box<Self>>) {
 		(self.boolean_type, self.op_symbol, self.left, self.right)
 	}
 
-	fn get_operands(
+	fn get_lr_operands(
 		&mut self,
-		target_type: BooleanAstType,
+		target_type: BoolType,
 	) -> (Vec<Option<Box<Self>>>, Vec<Option<Box<Self>>>) {
 		let mut node: Option<Box<Self>>;
 		let mut left_operands: Vec<Option<Box<Self>>> = vec![];
@@ -408,7 +408,7 @@ impl BooleanAstNode {
 					std::mem::swap(&mut node, &mut self.left);
 					left_operands.push(node);
 				} else {
-					let (mut lvec, mut rvec) = l.get_operands(target_type);
+					let (mut lvec, mut rvec) = l.get_lr_operands(target_type);
 					left_operands.append(&mut lvec);
 					left_operands.append(&mut rvec);
 					self.left = None;
@@ -418,7 +418,7 @@ impl BooleanAstNode {
 					std::mem::swap(&mut node, &mut self.right);
 					right_operands.push(node);
 				} else {
-					let (mut lvec, mut rvec) = r.get_operands(target_type);
+					let (mut lvec, mut rvec) = r.get_lr_operands(target_type);
 					right_operands.append(&mut lvec);
 					right_operands.append(&mut rvec);
 					self.right = None;
@@ -431,10 +431,15 @@ impl BooleanAstNode {
 		(left_operands, right_operands)
 	}
 
+	fn get_operands(&mut self, target_type: BoolType) -> Vec<Option<Box<Self>>> {
+		let mut operands: Vec<Option<Box<Self>>> = vec![];
+		operands
+	}
+
 	fn build_right_handed_tree_from_operand_list(
 		&mut self,
 		mut new_nodes: Vec<Box<Self>>,
-		target_type: BooleanAstType,
+		target_type: BoolType,
 	) {
 		let mut tmp: Box<Self>;
 		let mut new_right: Option<Box<Self>> = None;
@@ -466,21 +471,21 @@ impl BooleanAstNode {
 		}
 	}
 
-	pub fn distribute(&mut self, boolean_type: BooleanAstType) {
-		let inverse_type: BooleanAstType;
+	pub fn distribute(&mut self, boolean_type: BoolType) {
+		let inverse_type: BoolType;
 		let mut new_node: Box<Self>;
 
 		match boolean_type {
-			BooleanAstType::Conjunction => {
-				inverse_type = BooleanAstType::Disjunction;
+			BoolType::Conjunction => {
+				inverse_type = BoolType::Disjunction;
 			},
-			BooleanAstType::Disjunction => {
-				inverse_type = BooleanAstType::Conjunction;
+			BoolType::Disjunction => {
+				inverse_type = BoolType::Conjunction;
 			},
 			_ => panic!("cannot distribute '{}' op", boolean_type),
 		}
 		if self.boolean_type != boolean_type { return };
-		let (left_ops, right_ops) = self.get_operands(inverse_type);
+		let (left_ops, right_ops) = self.get_lr_operands(inverse_type);
 		if left_ops.len() == 0 && right_ops.len() == 0 { return };
 		self.change_type(inverse_type);
 		let mut new_nodes: Vec<Box<Self>> = vec![];
@@ -501,17 +506,17 @@ impl BooleanAstNode {
 		self.build_right_handed_tree_from_operand_list(new_nodes, inverse_type);
 	}
 
-	pub fn factor(&mut self, boolean_type: BooleanAstType) {
+	pub fn factor(&mut self, boolean_type: BoolType) {
 		let mut common_factor: Option<Box<Self>> = None;
 		let mut term_a: Option<Box<Self>> = None;
 		let mut term_b: Option<Box<Self>> = None;
-		let inverse_type: BooleanAstType;
+		let inverse_type: BoolType;
 		match boolean_type {
-			BooleanAstType::Conjunction => {
-				inverse_type = BooleanAstType::Disjunction;
+			BoolType::Conjunction => {
+				inverse_type = BoolType::Disjunction;
 			},
-			BooleanAstType::Disjunction => {
-				inverse_type = BooleanAstType::Conjunction;
+			BoolType::Disjunction => {
+				inverse_type = BoolType::Conjunction;
 			},
 			_ => panic!("cannot factor {} op", boolean_type),
 		}
@@ -565,17 +570,17 @@ impl BooleanAstNode {
 	}
 
 	pub fn replace_exclusive_disjunction(&mut self) {
-		if self.boolean_type != BooleanAstType::ExclusiveDisjunction { return };
+		if self.boolean_type != BoolType::ExclusiveDisjunction { return };
 		match (&self.left, &self.right) {
 			(Some(_), Some(_)) => {
 				let mut new_right = Box::new(Self::new('!'));
 				let mut copy = Box::new(self.clone());
-				copy.change_type(BooleanAstType::Conjunction);
+				copy.change_type(BoolType::Conjunction);
 				new_right.left = Some(copy);
 				let mut new_left = Box::new(Self::new('|'));
 				std::mem::swap(&mut new_left.left, &mut self.left);
 				std::mem::swap(&mut new_left.right, &mut self.right);
-				self.change_type(BooleanAstType::Conjunction);
+				self.change_type(BoolType::Conjunction);
 				self.left = Some(new_left);
 				self.right = Some(new_right);
 			},
@@ -586,10 +591,10 @@ impl BooleanAstNode {
 	}
 
 	pub fn replace_material_condition(&mut self) {
-		if self.boolean_type != BooleanAstType::MaterialCondition { return };
+		if self.boolean_type != BoolType::MaterialCondition { return };
 		match (&self.left, &self.right) {
 			(Some(_), Some(_)) => {
-				self.change_type(BooleanAstType::Disjunction);
+				self.change_type(BoolType::Disjunction);
 				let mut new_left = Box::new(Self::new('!'));
 				std::mem::swap(&mut new_left.left, &mut self.left);
 				self.left = Some(new_left);
@@ -601,16 +606,16 @@ impl BooleanAstNode {
 	}
 
 	pub fn replace_logical_equivalence(&mut self) {
-		if self.boolean_type != BooleanAstType::LogicalEquivalence { return };
+		if self.boolean_type != BoolType::LogicalEquivalence { return };
 		match (&self.left, &self.right) {
 			(Some(_), Some(_)) => {
 				let mut new_right = Box::new(self.clone());
-				new_right.change_type(BooleanAstType::MaterialCondition);
+				new_right.change_type(BoolType::MaterialCondition);
 				std::mem::swap(&mut new_right.left, &mut new_right.right);
 				let mut new_left = Box::new(Self::new('>'));
 				std::mem::swap(&mut new_left.left, &mut self.left);
 				std::mem::swap(&mut new_left.right, &mut self.right);
-				self.change_type(BooleanAstType::Conjunction);
+				self.change_type(BoolType::Conjunction);
 				self.left = Some(new_left);
 				self.right = Some(new_right);
 			},
@@ -622,9 +627,9 @@ impl BooleanAstNode {
 
 	pub fn eliminate_double_negation(&mut self) {
 		let mut next_useful_node: Option<Box<Self>> = None;
-		if self.boolean_type != BooleanAstType::Negation { return };
+		if self.boolean_type != BoolType::Negation { return };
 		if let Some(child) = &mut self.left {
-			if child.boolean_type != BooleanAstType::Negation { return };
+			if child.boolean_type != BoolType::Negation { return };
 			if let Some(_) = &mut child.left {
 				std::mem::swap(&mut next_useful_node, &mut child.left);
 			}
@@ -640,19 +645,19 @@ impl BooleanAstNode {
 
 	pub fn replace_junction_negation(&mut self) {
 		let mut next_useful_node: Option<Box<Self>> = None;
-		if self.boolean_type != BooleanAstType::Negation { return };
+		if self.boolean_type != BoolType::Negation { return };
 		if let Some(child) = &mut self.left {
-			if child.boolean_type != BooleanAstType::Disjunction
-				&& child.boolean_type != BooleanAstType::Conjunction {
+			if child.boolean_type != BoolType::Disjunction
+				&& child.boolean_type != BoolType::Conjunction {
 				return
 			};
 			std::mem::swap(&mut next_useful_node, &mut self.left);
 		}
 		if let Some(mut child) = next_useful_node {
-			let new_type = if child.boolean_type == BooleanAstType::Conjunction {
-				BooleanAstType::Disjunction
+			let new_type = if child.boolean_type == BoolType::Conjunction {
+				BoolType::Disjunction
 			} else {
-				BooleanAstType::Conjunction
+				BoolType::Conjunction
 			};
 			self.change_type(new_type);
 			let mut new_left = Box::new(Self::new('!'));
@@ -667,38 +672,38 @@ impl BooleanAstNode {
 	}
 
 	pub fn replace_disjunction(&mut self) {
-		self.distribute(BooleanAstType::Disjunction);
-		self.factor(BooleanAstType::Conjunction);
+		self.distribute(BoolType::Disjunction);
+		self.factor(BoolType::Conjunction);
 	}
 
 	pub fn replace_conjunction(&mut self) {
-		self.distribute(BooleanAstType::Conjunction);
-		self.factor(BooleanAstType::Disjunction);
+		self.distribute(BoolType::Conjunction);
+		self.factor(BoolType::Disjunction);
 	}
 
 	pub fn left_rotate_disjunction(&mut self) {
-		self.left_rotate(BooleanAstType::Disjunction);
+		self.left_rotate(BoolType::Disjunction);
 	}
 
 	pub fn right_rotate_disjunction(&mut self) {
-		self.right_rotate(BooleanAstType::Disjunction);
+		self.right_rotate(BoolType::Disjunction);
 	}
 
 	pub fn right_rotate_conjunction(&mut self) {
-		self.right_rotate(BooleanAstType::Conjunction);
+		self.right_rotate(BoolType::Conjunction);
 	}
 
 	pub fn negation_normal_form(&self) -> bool {
 		match self.boolean_type {
-			BooleanAstType::Variable => true,
-			BooleanAstType::Negation => {
+			BoolType::Variable => true,
+			BoolType::Negation => {
 				if let (Some(child), None) = (&self.left, &self.right) {
-					child.boolean_type == BooleanAstType::Variable
+					child.boolean_type == BoolType::Variable
 				} else {
 					panic!("invalid '{}' op", self.boolean_type);
 				}
 			},
-			BooleanAstType::Disjunction | BooleanAstType::Conjunction => {
+			BoolType::Disjunction | BoolType::Conjunction => {
 				if let (Some(left), Some(right)) = (&self.left, &self.right) {
 					left.negation_normal_form() && right.negation_normal_form()
 				} else {
@@ -711,23 +716,23 @@ impl BooleanAstNode {
 
 	fn cnf_check(&self, accept_conjunctions: bool) -> bool {
 		match (self.boolean_type, accept_conjunctions) {
-			(BooleanAstType::Conjunction, true) => {
+			(BoolType::Conjunction, true) => {
 				if let (Some(left), Some(right)) = (&self.left, &self.right) {
 					left.cnf_check(false) && right.cnf_check(true)
 				} else {
 					panic!("invalid '{}' op", self.boolean_type);
 				}
 			},
-			(BooleanAstType::Conjunction, false) => false,
-			(BooleanAstType::Disjunction, _) => {
+			(BoolType::Conjunction, false) => false,
+			(BoolType::Disjunction, _) => {
 				if let (Some(left), Some(right)) = (&self.left, &self.right) {
 					left.cnf_check(false) && right.cnf_check(false)
 				} else {
 					panic!("invalid '{}' op", self.boolean_type);
 				}
 			},
-			(BooleanAstType::Variable, _) => true,
-			(BooleanAstType::Negation, _) => true,
+			(BoolType::Variable, _) => true,
+			(BoolType::Negation, _) => true,
 			_ => panic!("invalid op '{}' in CNF", self.boolean_type),
 		}
 	}
@@ -756,7 +761,7 @@ impl BooleanAstNode {
 		if let Some(node) = node_opt {
 			tree.push_str(&format!("\n{}{}{}",
 				padding, pointer, node.boolean_type));
-			if node.boolean_type == BooleanAstType::Variable {
+			if node.boolean_type == BoolType::Variable {
 				tree.push_str(&format!("({})", node.op_symbol));
 			}
 			padding.push_str(if has_left_sibling { "│  " } else { "   " });
@@ -775,7 +780,7 @@ impl BooleanAstNode {
 		let pointer_right = if self.has_left() { "├──" } else { "└──" };
 
 		tree.push_str(&self.boolean_type.to_string());
-		if self.boolean_type == BooleanAstType::Variable {
+		if self.boolean_type == BoolType::Variable {
 			tree.push_str(&format!("({})", self.op_symbol));
 		}
 		Self::node_string(&mut tree, &self.right, String::new(),
@@ -787,7 +792,7 @@ impl BooleanAstNode {
 
 	pub fn to_formula(&self) -> String {
 		let mut formula = String::new();
-		fn add_node(node: &BooleanAstNode, formula: &mut String) {
+		fn add_node(node: &BoolNode, formula: &mut String) {
 			if let Some(left) = &node.left { add_node(left, formula); }
 			if let Some(right) = &node.right { add_node(right, formula); }
 			formula.push(node.op_symbol);
@@ -806,22 +811,22 @@ impl BooleanAstNode {
 
 	fn cnf(&mut self) {
 		match self.boolean_type {
-			BooleanAstType::Variable | BooleanAstType::Negation => (),
-			BooleanAstType::Conjunction | BooleanAstType::Disjunction => {
+			BoolType::Variable | BoolType::Negation => (),
+			BoolType::Conjunction | BoolType::Disjunction => {
 				if let (Some(l), Some(r)) = (&mut self.left, &mut self.right) {
 					l.cnf();
 					r.cnf();
 					match (self.boolean_type, l.boolean_type, r.boolean_type) {
-						(BooleanAstType::Disjunction, _, _) => {
-							self.distribute(BooleanAstType::Disjunction);
+						(BoolType::Disjunction, _, _) => {
+							self.distribute(BoolType::Disjunction);
 						},
 						(
-							BooleanAstType::Conjunction,
-							BooleanAstType::Conjunction,
-							BooleanAstType::Conjunction,
+							BoolType::Conjunction,
+							BoolType::Conjunction,
+							BoolType::Conjunction,
 						) => {
 							let (mut lops, mut rops) =
-								self.get_operands(BooleanAstType::Conjunction);
+								self.get_lr_operands(BoolType::Conjunction);
 							lops.append(&mut rops);
 							let mut ops: Vec<Box<Self>> = vec![];
 							for op in lops {
@@ -829,15 +834,15 @@ impl BooleanAstNode {
 							}
 							self.build_right_handed_tree_from_operand_list(
 								ops,
-								BooleanAstType::Conjunction,
+								BoolType::Conjunction,
 							);
 						},
 						(
-							BooleanAstType::Conjunction,
-							BooleanAstType::Conjunction,
+							BoolType::Conjunction,
+							BoolType::Conjunction,
 							_,
 						) => {
-							self.right_rotate(BooleanAstType::Conjunction);
+							self.right_rotate(BoolType::Conjunction);
 						},
 						_ => (),
 					}
@@ -857,13 +862,13 @@ impl BooleanAstNode {
 }
 
 pub fn negation_normal_form(formula: &str) -> String {
-	let mut ast = BooleanAstNode::tree(formula);
+	let mut ast = BoolNode::tree(formula);
 	ast.to_nnf();
 	ast.to_formula()
 }
 
 pub fn conjunctive_normal_form(formula: &str) -> String {
-	let mut ast = BooleanAstNode::tree(formula);
+	let mut ast = BoolNode::tree(formula);
 	ast.to_cnf();
 	ast.to_formula()
 }

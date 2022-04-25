@@ -20,30 +20,30 @@ fn main() {
     println!("");
 
 	let mut formula = "AB&C|";
-	let mut ast = BooleanAstNode::tree(formula);
+	let mut ast = BoolNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
 
 	formula = "ABC&|";
-	ast = BooleanAstNode::tree(formula);
+	ast = BoolNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
 
 	formula = "CZ&Z|!";
-	ast = BooleanAstNode::tree(formula);
+	ast = BoolNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
 
 	formula = "ABCDEFGH||=&&||!";
-	ast = BooleanAstNode::tree(formula);
+	ast = BoolNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
 
 	formula = "ABCDEFGHI>^|=&&||!";
-	ast = BooleanAstNode::tree(formula);
+	ast = BoolNode::tree(formula);
     println!("original:\t'{}'\nmine:\t\t'{}'\n{}\n",
 		formula, ast.to_formula(), ast);
-	ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
+	ast.pre_order(BoolNode::replace_exclusive_disjunction);
     println!("after XOR replacement:\t'{}'\n{}\n", ast.to_formula(), ast);
 
 	formula = "PQ^A|";
@@ -52,25 +52,25 @@ fn main() {
 
 	formula = "AB&A!B!&|";
 	let result = &negation_normal_form("AB=");
-	let mut formula_ast = BooleanAstNode::tree(formula);
-	let mut result_ast = BooleanAstNode::tree(result);
+	let mut formula_ast = BoolNode::tree(formula);
+	let mut result_ast = BoolNode::tree(result);
 	println!("formula: '{}'\n{}\n", formula, formula_ast);
 	println!("result: '{}'\n{}\n", result, result_ast);
 	truth_diff(formula, result);
 
 	formula = "AB&!CD|!EF>!GH^!&!&!&!";
 	let result = negation_normal_form(formula);
-	formula_ast = BooleanAstNode::tree(formula);
-	result_ast = BooleanAstNode::tree(&result);
+	formula_ast = BoolNode::tree(formula);
+	result_ast = BoolNode::tree(&result);
 	println!("formula: '{}'\n{}\n", formula, formula_ast);
 	println!("result: '{}'\n{}\n", result, result_ast);
 	truth_diff(formula, &result);
 
 	formula = "AB|C|D|";
 	let result = "ABCD|||";
-	formula_ast = BooleanAstNode::tree(formula);
-	result_ast = BooleanAstNode::tree(result);
-	ast = BooleanAstNode::tree(formula);
+	formula_ast = BoolNode::tree(formula);
+	result_ast = BoolNode::tree(result);
+	ast = BoolNode::tree(formula);
 	ast.to_cnf();
 	println!("formula: '{}'\n{}\n", formula, formula_ast);
 	println!("result: '{}'\n{}\n", result, result_ast);
@@ -78,90 +78,90 @@ fn main() {
 
 	formula = "ABCD&|&";
 	let result = "ABC|BD|&&";
-	formula_ast = BooleanAstNode::tree(formula);
-	result_ast = BooleanAstNode::tree(result);
+	formula_ast = BoolNode::tree(formula);
+	result_ast = BoolNode::tree(result);
 	println!("formula: '{}'\n{}\n", formula, formula_ast);
 	println!("result: '{}'\n{}\n", result, result_ast);
 
 	formula = "ABCDEFGH>IJKL|&|&|&|&|&";
-	let mut orig = BooleanAstNode::tree(formula);
+	let mut orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	let mut mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "ABC|BD|E|BD&F|G!H||BDF||I|J|BDFI|||KL||&&&&&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "BF|DF|&G!H||BDFIJ||||BDFI|||KL||&&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "BF&DF&&G!H||BDFIJ||||BDFI|||KL||&&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "BF|DF|&G!H&|BDFIJ||||BDFI|||KL||&&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "BF|DF|&G!H|&BDFIJ||||BDFI|||KL||&&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "BF&DF&&G!H&&BDFIJ&&&&BDFI|||KL||&&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "BF&DF&&G!H&&BDFIJ&&&&BDFI&||KL||&&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "BF&DF&&G!H&&BDFIJ&&&&BDFI|&|KL||&&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "BF&DF&&G!H&&BDFIJ&&&&BDFI||&KL||&&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "BDFIJ&&&&BDFI||&KL||&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 
 	formula = "BDFI||&KL||";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
 	mine.to_cnf();
@@ -169,19 +169,19 @@ fn main() {
 	*/
 
 	let mut formula = "AB&CD||";
-	let mut orig = BooleanAstNode::tree(formula);
+	let mut orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	let mut mine = orig.clone();
 	mine.to_cnf();
 	println!("mine: '{}'\n{}\n", mine.to_formula(), mine);
 	mine = orig.clone();
-	mine.distribute(BooleanAstType::Disjunction);
-	println!("mine.distribute(BooleanAstType::Disjunction): '{}'\n{}\n",
+	mine.distribute(BoolType::Disjunction);
+	println!("mine.distribute(BoolType::Disjunction): '{}'\n{}\n",
 		mine.to_formula(), mine);
 
 	//formula = "ABCDEFGH>IJKL|&|&|&|&|&";
 	formula = "ABCDEFG!H|IJKL|&|&|&|&|&";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	let mut mine = orig.clone();
 	mine.to_cnf();
@@ -189,11 +189,11 @@ fn main() {
 
 	/*
 	formula = "AB|CD&|";
-	orig = BooleanAstNode::tree(formula);
+	orig = BoolNode::tree(formula);
 	println!("orig: '{}'\n{}\n", formula, orig);
 	mine = orig.clone();
-	mine.distribute(BooleanAstType::Disjunction);
-	println!("mine.distribute(BooleanAstType::Disjunction): '{}'\n{}\n",
+	mine.distribute(BoolType::Disjunction);
+	println!("mine.distribute(BoolType::Disjunction): '{}'\n{}\n",
 		mine.to_formula(), mine);
 	mine = orig.clone();
 	mine.to_cnf();
@@ -428,80 +428,80 @@ mod tests {
 	#[test]
 	fn bool_ast_tree_basics() {
 		let mut formula = "A";
-		let mut ast = BooleanAstNode::tree(formula);
+		let mut ast = BoolNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
 
 		formula = "AB|";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
 
 		formula = "AB&C|";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
 
 		formula = "ABC&|";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
 
 		formula = "AB=";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
 
 		formula = "AB=!";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
 
 		formula = "ABCDEFGH||=&&||!";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
 
 		formula = "ABCDEFGHI>^|=&&||!";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		assert_eq!(formula, &ast.to_formula());
 	}
 
 	#[test]
     #[should_panic(expected = "formula string is empty")]
 	fn bool_ast_tree_empty_string() {
-		BooleanAstNode::tree("");
+		BoolNode::tree("");
 	}
 
 	#[test]
     #[should_panic(expected = "unused operands in formula string")]
 	fn bool_ast_tree_unused_operands() {
-		BooleanAstNode::tree("ABC|");
+		BoolNode::tree("ABC|");
 	}
 
 	#[test]
     #[should_panic(expected = "missing operand for 'Negation' operation")]
 	fn bool_ast_tree_missing_operand() {
-		BooleanAstNode::tree("!");
+		BoolNode::tree("!");
 	}
 
 	#[test]
 	fn bool_ast_replace_exclusive_disjunction() {
 		let mut formula = "PQ^";
 		let mut expected = "PQ|PQ&!&";
-		let mut ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
+		let mut ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_exclusive_disjunction);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "PQ^A|";
 		expected = "PQ|PQ&!&A|";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_exclusive_disjunction);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "ABCDEFGHI>^|=^^||!";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_exclusive_disjunction);
 		truth_diff(formula, &ast.to_formula());
 
 		formula = "ABCDEFGHI>^^=^^^^!";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_exclusive_disjunction);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_exclusive_disjunction);
 		truth_diff(formula, &ast.to_formula());
 	}
 
@@ -509,28 +509,28 @@ mod tests {
 	fn bool_ast_replace_material_condition() {
 		let mut formula = "AB>";
 		let mut expected = "A!B|";
-		let mut ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_material_condition);
+		let mut ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_material_condition);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "ABC|>";
 		expected = "A!BC||";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_material_condition);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_material_condition);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "AB^CD|>";
 		expected = "AB^!CD||";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_material_condition);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_material_condition);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "ABCDEFGHI>>^=>>||!";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_material_condition);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_material_condition);
 		truth_diff(formula, &ast.to_formula());
 	}
 
@@ -538,28 +538,28 @@ mod tests {
 	fn bool_ast_replace_logical_equivalence() {
 		let mut formula = "AB=";
 		let mut expected = "AB>BA>&";
-		let mut ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_logical_equivalence);
+		let mut ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_logical_equivalence);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "ABC|=";
 		expected = "ABC|>BC|A>&";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_logical_equivalence);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_logical_equivalence);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "AB^CD|=";
 		expected = "AB^CD|>CD|AB^>&";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_logical_equivalence);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_logical_equivalence);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "ABCDEFGHI>==^====!";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_material_condition);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_material_condition);
 		truth_diff(formula, &ast.to_formula());
 	}
 
@@ -567,29 +567,29 @@ mod tests {
 	fn bool_ast_eliminate_double_negation() {
 		let mut formula = "A!!";
 		let mut expected = "A";
-		let mut ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::eliminate_double_negation);
+		let mut ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::eliminate_double_negation);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "A!!!!!B|";
 		expected = "A!B|";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::eliminate_double_negation);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::eliminate_double_negation);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "A!!!!!!B!!|";
 		expected = "AB|";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::eliminate_double_negation);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::eliminate_double_negation);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "AB|!!!!!!!CD!E|^!!|";
 		expected = "AB|!CD!E|^|";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::eliminate_double_negation);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::eliminate_double_negation);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 	}
@@ -598,29 +598,29 @@ mod tests {
 	fn bool_ast_replace_junction_negation() {
 		let mut formula = "AB&!";
 		let mut expected = "A!B!|";
-		let mut ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_junction_negation);
+		let mut ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_junction_negation);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "AB|!";
 		expected = "A!B!&";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_junction_negation);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_junction_negation);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "AB|!!";
 		expected = "A!B!&!";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_junction_negation);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_junction_negation);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 
 		formula = "AB&CD^|!";
 		expected = "A!B!|CD^!&";
-		ast = BooleanAstNode::tree(formula);
-		ast.pre_order(BooleanAstNode::replace_junction_negation);
+		ast = BoolNode::tree(formula);
+		ast.pre_order(BoolNode::replace_junction_negation);
 		assert_eq!(ast.to_formula(), expected);
 		truth_diff(formula, expected);
 	}
@@ -628,32 +628,32 @@ mod tests {
 	#[test]
 	fn nnf_subject_tests() {
 		let mut formula = "AB&!";
-		let mut ast = BooleanAstNode::tree(formula);
+		let mut ast = BoolNode::tree(formula);
 		ast.to_nnf();
 		assert!(ast.negation_normal_form());
 		assert_eq!("A!B!|", negation_normal_form(formula));
 
 		formula = "AB|!";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		ast.to_nnf();
 		assert!(ast.negation_normal_form());
 		assert_eq!("A!B!&", negation_normal_form(formula));
 
 		formula = "AB>";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		ast.to_nnf();
 		assert!(ast.negation_normal_form());
 		assert_eq!("A!B|", negation_normal_form(formula));
 
 		formula = "AB=";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		ast.to_nnf();
 		assert!(ast.negation_normal_form());
 		//assert_eq!("AB&A!B!&|", negation_normal_form("AB="));
 		truth_diff("AB&A!B!&|", &negation_normal_form(formula));
 
 		formula = "AB|C&!";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		ast.to_nnf();
 		assert!(ast.negation_normal_form());
 		assert_eq!("A!B!&C!|", negation_normal_form(formula));
@@ -662,7 +662,7 @@ mod tests {
 	#[test]
 	fn nnf_harder_tests() {
 		let formula = "AB&!CD|!EF>!GH^!&!&!&!";
-		let mut ast = BooleanAstNode::tree(formula);
+		let mut ast = BoolNode::tree(formula);
 		ast.to_nnf();
 		assert!(ast.negation_normal_form());
 		truth_diff(formula, &negation_normal_form(formula));
@@ -671,50 +671,50 @@ mod tests {
 	#[test]
 	fn rotations() {
 		let mut formula = "AB|C|";
-		let mut ast = BooleanAstNode::tree(formula);
-		ast.right_rotate(BooleanAstType::Disjunction);
+		let mut ast = BoolNode::tree(formula);
+		ast.right_rotate(BoolType::Disjunction);
 		assert_eq!("ABC||", ast.to_formula());
-		ast.left_rotate(BooleanAstType::Disjunction);
+		ast.left_rotate(BoolType::Disjunction);
 		assert_eq!(formula, ast.to_formula());
 
 		formula = "AB&C&";
-		ast = BooleanAstNode::tree(formula);
-		ast.right_rotate(BooleanAstType::Conjunction);
+		ast = BoolNode::tree(formula);
+		ast.right_rotate(BoolType::Conjunction);
 		assert_eq!("ABC&&", ast.to_formula());
-		ast.left_rotate(BooleanAstType::Conjunction);
+		ast.left_rotate(BoolType::Conjunction);
 		assert_eq!(formula, ast.to_formula());
 
 		formula = "AB&C|";
-		ast = BooleanAstNode::tree(formula);
-		ast.right_rotate(BooleanAstType::Disjunction);
+		ast = BoolNode::tree(formula);
+		ast.right_rotate(BoolType::Disjunction);
 		assert_eq!(formula, ast.to_formula());
-		ast.left_rotate(BooleanAstType::Disjunction);
+		ast.left_rotate(BoolType::Disjunction);
 		assert_eq!(formula, ast.to_formula());
 	}
 
 	#[test]
 	fn distribute() {
 		let formula = "ABC&|";
-		let mut ast = BooleanAstNode::tree(formula);
-		ast.distribute(BooleanAstType::Disjunction);
+		let mut ast = BoolNode::tree(formula);
+		ast.distribute(BoolType::Disjunction);
 		assert_eq!("AB|AC|&", ast.to_formula());
 		truth_diff(formula, &ast.to_formula());
 
 		let formula = "AD&C|";
-		ast = BooleanAstNode::tree(formula);
-		ast.distribute(BooleanAstType::Disjunction);
+		ast = BoolNode::tree(formula);
+		ast.distribute(BoolType::Disjunction);
 		assert_eq!("AC|DC|&", ast.to_formula());
 		truth_diff(formula, &ast.to_formula());
 
 		let formula = "ABC|&";
-		ast = BooleanAstNode::tree(formula);
-		ast.distribute(BooleanAstType::Conjunction);
+		ast = BoolNode::tree(formula);
+		ast.distribute(BoolType::Conjunction);
 		assert_eq!("AB&AC&|", ast.to_formula());
 		truth_diff(formula, &ast.to_formula());
 
 		let formula = "AD|C&";
-		ast = BooleanAstNode::tree(formula);
-		ast.distribute(BooleanAstType::Conjunction);
+		ast = BoolNode::tree(formula);
+		ast.distribute(BoolType::Conjunction);
 		assert_eq!("AC&DC&|", ast.to_formula());
 		truth_diff(formula, &ast.to_formula());
 	}
@@ -722,32 +722,32 @@ mod tests {
 	#[test]
 	fn factor() {
 		let formula = "AB|AC|&";
-		let mut ast = BooleanAstNode::tree(formula);
-		ast.factor(BooleanAstType::Disjunction);
+		let mut ast = BoolNode::tree(formula);
+		ast.factor(BoolType::Disjunction);
 		assert_eq!("ABC&|", ast.to_formula());
 		truth_diff(formula, &ast.to_formula());
 
 		let formula = "AB&AC&|";
-		ast = BooleanAstNode::tree(formula);
-		ast.factor(BooleanAstType::Conjunction);
+		ast = BoolNode::tree(formula);
+		ast.factor(BoolType::Conjunction);
 		assert_eq!("ABC|&", ast.to_formula());
 		truth_diff(formula, &ast.to_formula());
 
 		let formula = "AB|CA|&";
-		ast = BooleanAstNode::tree(formula);
-		ast.factor(BooleanAstType::Disjunction);
+		ast = BoolNode::tree(formula);
+		ast.factor(BoolType::Disjunction);
 		assert_eq!("ABC&|", ast.to_formula());
 		truth_diff(formula, &ast.to_formula());
 
 		let formula = "BA|AC|&";
-		ast = BooleanAstNode::tree(formula);
-		ast.factor(BooleanAstType::Disjunction);
+		ast = BoolNode::tree(formula);
+		ast.factor(BoolType::Disjunction);
 		assert_eq!("ABC&|", ast.to_formula());
 		truth_diff(formula, &ast.to_formula());
 
 		let formula = "BA|CA|&";
-		ast = BooleanAstNode::tree(formula);
-		ast.factor(BooleanAstType::Disjunction);
+		ast = BoolNode::tree(formula);
+		ast.factor(BoolType::Disjunction);
 		assert_eq!("ABC&|", ast.to_formula());
 		truth_diff(formula, &ast.to_formula());
 	}
@@ -755,40 +755,40 @@ mod tests {
 	#[test]
 	fn cnf_subject_tests() {
 		let mut formula = "AB&!";
-		let mut ast = BooleanAstNode::tree(formula);
+		let mut ast = BoolNode::tree(formula);
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
 		assert_eq!("A!B!|", conjunctive_normal_form(formula));
 
 		formula = "AB|!";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
 		assert_eq!("A!B!&", conjunctive_normal_form(formula));
 
 		formula = "AB|C&";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
 		assert_eq!("AB|C&", conjunctive_normal_form(formula));
 
+		formula = "AB|C|D|";
+		ast = BoolNode::tree(formula);
+		ast.to_cnf();
+		assert!(ast.conjunctive_normal_form());
+		assert_eq!("ABCD|||", conjunctive_normal_form(formula));
+
 		formula = "ABCD&|&";
-		ast = BooleanAstNode::tree(formula);
+		ast = BoolNode::tree(formula);
 		ast.to_cnf();
 		assert!(ast.conjunctive_normal_form());
 		assert_eq!("ABC|BD|&&", conjunctive_normal_form(formula));
-
-		formula = "AB|C|D|";
-		ast = BooleanAstNode::tree(formula);
-		ast.to_cnf();
-		assert!(ast.conjunctive_normal_form());
-		//assert_eq!("ABCD|||", conjunctive_normal_form(formula));
 	}
 
 	#[test]
 	fn cnf_harder_tests() {
 		fn cnf_hard_test(formula: &str) {
-			let mut orig = BooleanAstNode::tree(formula);
+			let mut orig = BoolNode::tree(formula);
 			let mut mine = orig.clone();
 			mine.to_cnf();
 			assert_eq!(orig, mine);
