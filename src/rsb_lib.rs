@@ -49,3 +49,38 @@ pub fn conjunctive_normal_form(formula: &str) -> String {
 	ast.to_cnf();
 	ast.to_formula()
 }
+
+pub fn map(x: u16, y: u16) -> f64 {
+	let mut bits: u64 = 0;
+	let mut offset: u8 = 0;
+	let mut result: f64 = 0.0;
+	let mut interleaved: u32 = 0;
+
+	for shift in 0..16 {
+		let x_bit = (x as u32 >> shift) & 1;
+		interleaved |= x_bit << (15 - shift) * 2;
+		let y_bit = (y as u32 >> shift) & 1;
+		interleaved |= y_bit << (15 - shift) * 2 + 1;
+	}
+	bits = (gray_code(interleaved) as u64) << 32;
+	result = f64::from_bits(bits);
+	while result.is_sign_negative() || result > 1.0 || result.is_nan() {
+		bits >>= 1;
+		offset += 1;
+		bits &= !0xff;
+		bits |= offset as u64;
+		result = f64::from_bits(bits);
+	}
+	result
+}
+
+pub fn reverse_map(n: f64) -> (u16, u16) {
+	/*
+	if n > 1.0 || n < 0.0 {
+		panic!("input number '{}' is out of range [0;1]", n);
+	}
+	*/
+	let bytes = n.to_be_bytes();
+	println!("{}: {:?}", n, bytes);
+	(0, 0)
+}

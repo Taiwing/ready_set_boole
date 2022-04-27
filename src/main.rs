@@ -201,6 +201,97 @@ fn main() {
 	println!("mine.to_cnf(): '{}'\n{}\n", mine.to_formula(), mine);
 	*/
 	*/
+
+	reverse_map(f64::MIN_POSITIVE);
+	let test = f64::from_bits(0b0011111111010101010101010101010101010101010101010101010101010101);
+	reverse_map(test);
+	let test = f64::from_bits(0b0011111100000001010101010101010101010101010101010101010101010101);
+	reverse_map(test);
+	let test = f64::from_bits(
+		0b0_01111111111_0000000000000000000000000000000000000000000000000000
+	);
+	reverse_map(test);
+	let test = f64::from_bits(
+		0b0_01111111110_0000000000000000000000000000000000000000000000000000
+	);
+	reverse_map(test);
+	let test = f64::from_bits(
+		0b0_01111111100_0000000000000000000000000000000000000000000000000000
+	);
+	reverse_map(test);
+	let test = f64::from_bits(
+		0b0_01111111000_0000000000000000000000000000000000000000000000000000
+	);
+	reverse_map(test);
+	let test = f64::from_bits(
+		0b0_01111110000_0000000000000000000000000000000000000000000000000000
+	);
+	reverse_map(test);
+	let test = f64::from_be_bytes([63, 239, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]);
+	if test == 1.0 {
+		println!("YEAH!!!!");
+	}
+	reverse_map(test);
+	let test = f64::from_be_bytes([63, 239, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe]);
+	reverse_map(test);
+	for mut second_byte in 0..=255 {
+		second_byte &= !16;
+		let test = f64::from_be_bytes([63, second_byte, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+		reverse_map(test);
+	}
+	let (x, y) = (0, 0);
+	let result = map(x, y);
+	println!("map({}, {}) = {} ({:#0b})", x, y, result, result.to_bits());
+	println!("in bytes: {:?}", result.to_be_bytes());
+
+	let (x, y) = (0b11110000, 0b00001111);
+	let result = map(x, y);
+	println!("map({}, {}) = {} ({:#0b})", x, y, result, result.to_bits());
+	println!("in bytes: {:?}", result.to_be_bytes());
+
+	let (x, y) = (0b0, 0xffff);
+	let result = map(x, y);
+	println!("map({}, {}) = {} ({:#0b})", x, y, result, result.to_bits());
+	println!("in bytes: {:?}", result.to_be_bytes());
+
+	let (x, y) = (1234, 4321);
+	let result = map(x, y);
+	println!("map({}, {}) = {} ({:#0b})", x, y, result, result.to_bits());
+	println!("in bytes: {:?}", result.to_be_bytes());
+
+	let (x, y) = (0b1111, 0b1111);
+	let result = map(x, y);
+	println!("map({}, {}) = {} ({:#0b})", x, y, result, result.to_bits());
+	println!("in bytes: {:?}", result.to_be_bytes());
+
+	let (x, y) = (0xffff, 0xffff);
+	let result = map(x, y);
+	println!("map({}, {}) = {} ({:#0b})", x, y, result, result.to_bits());
+	println!("in bytes: {:?}", result.to_be_bytes());
+
+	let (x, y) = (1, 1);
+	let result = map(x, y);
+	println!("map({}, {}) = {} ({:#0b})", x, y, result, result.to_bits());
+	println!("in bytes: {:?}", result.to_be_bytes());
+
+	let (x, y) = (42, 42);
+	let result = map(x, y);
+	println!("map({}, {}) = {} ({:#0b})", x, y, result, result.to_bits());
+	println!("in bytes: {:?}", result.to_be_bytes());
+
+	let (x, y) = (123, 5);
+	let result = map(x, y);
+	println!("map({}, {}) = {} ({:#0b})", x, y, result, result.to_bits());
+	println!("in bytes: {:?}", result.to_be_bytes());
+
+	/*
+	let mut n: f64 = 0.0;
+	for _ in 0..=10 {
+		reverse_map(n);
+		n += 0.1;
+	}
+	reverse_map(1.0);
+	*/
 }
 
 fn adder_diff(left: u32, right: u32) {
@@ -921,5 +1012,25 @@ mod tests {
 		let sets: Vec<Vec<i32>> = vec![vec![0, 1, 2], vec![0, 1, 2]];
 		let result = eval_set("AB=", &sets);
 		assert_eq!(result, vec![0, 1, 2]);
+	}
+
+	#[test]
+	fn map_is_in_range() {
+		let (x, y) = (0, 0);
+		let result = map(x, y);
+		assert_eq!(result, 0.0);
+
+		let (x, y) = (0, 1);
+		let result = map(x, y);
+		assert!(result != 0.0);
+
+		for coordinates in (0..=u32::MAX).step_by(4242) {
+			let x = (coordinates & 0xffff) as u16;
+			let y = ((coordinates & 0xffff0000) >> 16) as u16;
+			let result = map(x, y);
+			assert!(result.is_sign_positive());
+			assert!(result.is_nan() == false);
+			assert!(result <= 1.0);
+		}
 	}
 }
