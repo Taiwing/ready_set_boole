@@ -31,9 +31,7 @@ pub fn multiplier(mut a: u32, mut b: u32) -> u32 {
 }
 
 pub fn gray_code(n: u32) -> u32 {
-    let tmp: u64 = n.into();
-
-    (tmp ^ (tmp >> 1)).try_into().unwrap()
+	n ^ (n >> 1)
 }
 
 pub fn print_truth_table(formula: &str) {
