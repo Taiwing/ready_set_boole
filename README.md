@@ -38,10 +38,10 @@ then performed and the result is pushed to the stack.
 | Symbol | Mathematical Equivalent | Meaning                     |
 |:------:|:-----------------------:|-----------------------------|
 | 0      | ⊥                       | False                       |
-| 1      | >                       | True                        |
+| 1      | T                       | True                        |
 | !      | ¬                       | Negation (NOT)              |
 | &      | ∧                       | Conjunction (AND)           |
-| |      | ∨                       | Disjunction (OR)            |
+| \|     | ∨                       | Disjunction (OR)            |
 | ^      | ⊕                       | Exclusive Disjunction (XOR) |
 | >      | ⇒                       | Material Condition          |
 | =      | ⇔                       | Logical Equivalence         |
