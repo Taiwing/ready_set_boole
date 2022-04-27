@@ -70,3 +70,37 @@ Logical Equivalence ('=')
 
 Here the Logical Equivalence operation is the highest and will be fully
 evaluated last since it depends on every other operation result.
+
+The other boolean-themed exercises introduce variables into the formula. The 4th
+one is about printing the truth table of a given formula. This gives the result
+of the evaluated formula for each possible variable value set.
+
+### example:
+
+We replace each literal value for the above example with a different variable.
+
+```rust
+let formula = "ABCD||=";
+print_truth_table(formula);
+```
+
+Which will print:
+
+| A | B | C | D | = |
+|---|---|---|---|---|
+| 0 | 0 | 0 | 0 | 1 |
+| 0 | 0 | 0 | 1 | 0 |
+| 0 | 0 | 1 | 0 | 0 |
+| 0 | 0 | 1 | 1 | 0 |
+| 0 | 1 | 0 | 0 | 0 |
+| 0 | 1 | 0 | 1 | 0 |
+| 0 | 1 | 1 | 0 | 0 |
+| 0 | 1 | 1 | 1 | 0 |
+| 1 | 0 | 0 | 0 | 0 |
+| 1 | 0 | 0 | 1 | 1 |
+| 1 | 0 | 1 | 0 | 1 |
+| 1 | 0 | 1 | 1 | 1 |
+| 1 | 1 | 0 | 0 | 1 |
+| 1 | 1 | 0 | 1 | 1 |
+| 1 | 1 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 1 | 1 |
