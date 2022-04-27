@@ -162,3 +162,34 @@ This is done using the following rewriting rules:
 > ∧ (P2 ∨ Q1) ∧ (P2 ∨ Q2) ... ∧ (P2 ∨ Qm)
 > ∧ ... ∧ (Pn ∨ Q1) ∧ (Pn ∨ Q2) ... ∧ (Pn ∨ Qm)*  
 > Where every P and Q is a disjunction of literals.
+
+### example:
+
+```rust
+// set string to a non CNF formula
+let formula = "AD&C|";
+// print --> "AC|DC|&"
+println!("{}", conjunctive_normal_form(formula));
+```
+
+Before CNF:
+
+```
+Disjunction
+├──Variable(C)
+└──Conjunction
+   ├──Variable(D)
+   └──Variable(A)
+```
+
+After CNF:
+
+```
+Conjunction
+├──Disjunction
+│  ├──Variable(C)
+│  └──Variable(D)
+└──Disjunction
+   ├──Variable(C)
+   └──Variable(A)
+```
