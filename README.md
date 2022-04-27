@@ -58,22 +58,26 @@ println!("result: {}", eval_formula(formula));
 More Complex formulas are hard to read and are better understood when
 represented in a tree format, which is easy to do from RPN string.
 
-For example "1011||=" can be represented like this:
+For example `"1011||="` can be represented like this:
 
-Logical Equivalence ('=')  
-├──Disjunction ('|')  
-│  ├──Disjunction ('|')  
-│  │  ├──True ('1')  
-│  │  └──True ('1')  
-│  └──False ('0')  
-└──True ('1')  
+> Logical Equivalence ('=')  
+> ├──Disjunction ('|')  
+> │  ├──Disjunction ('|')  
+> │  │  ├──True ('1')  
+> │  │  └──True ('1')  
+> │  └──False ('0')  
+> └──True ('1')  
+
+Or like this:
+
+> ((T ∨ T) ∨ ⊥) ⇔ T = T
 
 Here the Logical Equivalence operation is the highest and will be fully
 evaluated last since it depends on every other operation result.
 
 The other boolean-themed exercises introduce variables into the formula. The 4th
 one is about printing the truth table of a given formula. This gives the result
-of the evaluated formula for each possible variable value set.
+of each possible value set.
 
 ### example:
 
