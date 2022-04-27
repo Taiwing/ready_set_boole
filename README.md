@@ -75,6 +75,8 @@ Or like this: `((T ∨ T) ∨ ⊥) ⇔ T = T`
 Here the Logical Equivalence operation is the highest and will be fully
 evaluated last since it depends on every other operation result.
 
+## Truth Table
+
 The other boolean-themed exercises introduce boolean variables. The 4th one is
 about printing the truth table of a given formula. This gives the result for
 each possible value set. The `print_truth_table()` function is to be implemented
