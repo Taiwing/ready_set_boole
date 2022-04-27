@@ -155,9 +155,10 @@ This is done using the following rewriting rules:
 * Conjunctive Distributivity: *A ∧ (B ∨ C) ⇔ (A ∧ B) ∨ (A ∧ C)*
 * Disjunctive Distributivity: *A ∨ (B ∧ C) ⇔ (A ∨ B) ∧ (A ∨ C)*
 
-> To make a given formula the distributivity rules must be applied in their
+> To make a given formula CNF the distributivity rules must be applied in their
 > general form, which is:  
-> *(P1 & P2 ... & Pn) | (Q1 & Q2 ... & Qm) =  
-> (P1 | Q1) & (P1 | Q2) ... & (P1 | Qm)  
-> & (P2 | Q1) & (P2 | Q2) ... & (P2 | Qm)  
-> & ... & (Pn | Q1) & (Pn | Q2) ... & (Pn | Qm)*
+> *(P1 ∧ P2 ... ∧ Pn) ∨ (Q1 ∧ Q2 ... ∧ Qm) =  
+> 	(P1 ∨ Q1) ∧ (P1 ∨ Q2) ... ∧ (P1 ∨ Qm)  
+> 	∧ (P2 ∨ Q1) ∧ (P2 ∨ Q2) ... ∧ (P2 ∨ Qm)  
+> 	∧ ... ∧ (Pn ∨ Q1) ∧ (Pn ∨ Q2) ... ∧ (Pn ∨ Qm)*  
+> Where every P and Q is a disjunction of literals.
