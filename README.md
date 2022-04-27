@@ -60,13 +60,13 @@ represented in a tree format, which is easy to do from RPN string.
 
 For example "1011||=" can be represented like this:
 
-Logical Equivalence ('=')
-├──Disjunction ('|')
-│  ├──Disjunction ('|')
-│  │  ├──True ('1')
-│  │  └──True ('1')
-│  └──False ('0')
-└──True ('1')
+Logical Equivalence ('=')  
+├──Disjunction ('|')  
+│  ├──Disjunction ('|')  
+│  │  ├──True ('1')  
+│  │  └──True ('1')  
+│  └──False ('0')  
+└──True ('1')  
 
 Here the Logical Equivalence operation is the highest and will be fully
 evaluated last since it depends on every other operation result.
