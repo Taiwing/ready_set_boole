@@ -60,35 +60,37 @@ represented in a tree format, which is easy to do from RPN string.
 
 For example `"1011||="` can be represented like this:
 
-> Logical Equivalence ('=')  
-> ├──Disjunction ('|')  
-> │  ├──Disjunction ('|')  
-> │  │  ├──True ('1')  
-> │  │  └──True ('1')  
-> │  └──False ('0')  
-> └──True ('1')  
+```
+Logical Equivalence ('=')  
+├──Disjunction ('|')  
+│  ├──Disjunction ('|')  
+│  │  ├──True ('1')  
+│  │  └──True ('1')  
+│  └──False ('0')  
+└──True ('1')  
+```
 
-Or like this:
-
-> ((T ∨ T) ∨ ⊥) ⇔ T = T
+Or like this: `((T ∨ T) ∨ ⊥) ⇔ T = T`
 
 Here the Logical Equivalence operation is the highest and will be fully
 evaluated last since it depends on every other operation result.
 
-The other boolean-themed exercises introduce variables into the formula. The 4th
-one is about printing the truth table of a given formula. This gives the result
-for each possible value set.
+The other boolean-themed exercises introduce boolean variables. The 4th one is
+about printing the truth table of a given formula. This gives the result for
+each possible value set. The `print_truth_table()` function is to be implemented
+with a maximum time complexity of O(2^n). This is because a simple implentation
+of this function will replace each variable by a given literal value and call
+the `eval_formula()` on the result. Since a boolean has two possible values the
+number of operations will double for each additional variable in the formula.
 
 ### example:
-
-We replace each literal value for the above example with a different variable.
 
 ```rust
 let formula = "ABCD||=";
 print_truth_table(formula);
 ```
 
-Which will print:
+Will print:
 
 | A | B | C | D | = |
 |---|---|---|---|---|
