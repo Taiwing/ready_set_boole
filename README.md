@@ -77,7 +77,7 @@ evaluated last since it depends on every other operation result.
 
 The other boolean-themed exercises introduce variables into the formula. The 4th
 one is about printing the truth table of a given formula. This gives the result
-of each possible value set.
+for each possible value set.
 
 ### example:
 
