@@ -1045,4 +1045,22 @@ mod tests {
 			assert_eq!(y_in, y_out);
 		}
 	}
+
+	#[test]
+    #[should_panic(expected = "input number '2' is out of range [0;1]")]
+	fn reverse_map_too_big() {
+		reverse_map(2.0);
+	}
+
+	#[test]
+    #[should_panic(expected = "input number 'NaN' is out of range [0;1]")]
+	fn reverse_map_nan() {
+		reverse_map(f64::NAN);
+	}
+
+	#[test]
+    #[should_panic(expected = "input number '-42' is out of range [0;1]")]
+	fn reverse_map_negative() {
+		reverse_map(-42.0);
+	}
 }
