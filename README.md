@@ -143,7 +143,7 @@ Disjunctions and Conjunctions.
 The `conjunctive_normal_form()` function converts the given formula into
 [CNF](https://en.wikipedia.org/wiki/Conjunctive_normal_form). CNF has the same
 requirements as NNF. So every CNF proposition is also NNF but not the reverse
-since it adds an other condition. A CNF proposition is conjunction of multiple
+since it adds an other condition. A CNF proposition is a conjunction of multiple
 clauses where a clause is itself a disjunction of literals. This means that in
 reverse polish notation every Conjunctive operator must be at the end of the
 formula.
