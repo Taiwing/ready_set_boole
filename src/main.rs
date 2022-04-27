@@ -1072,6 +1072,11 @@ mod tests {
 		let (x, y) = reverse_map(n_in);
 		let n_out = map(x, y);
 		assert_eq!(n_out, n_in);
+
+		let n_in = f64::EPSILON;
+		let (x, y) = reverse_map(n_in);
+		let n_out = map(x, y);
+		assert_eq!(n_out, n_in);
 	}
 
 	#[test]
