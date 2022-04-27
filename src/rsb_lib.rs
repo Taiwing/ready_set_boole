@@ -85,7 +85,7 @@ pub fn map(x: u16, y: u16) -> f64 {
 }
 
 pub fn reverse_map(n: f64) -> (u16, u16) {
-	if n > 1.0 || n < 0.0 {
+	if n.is_sign_negative() || n > 1.0 || n.is_nan() {
 		panic!("input number '{}' is out of range [0;1]", n);
 	}
 	let bits = n.to_bits();
