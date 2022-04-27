@@ -17,7 +17,7 @@ git clone https://github.com/Taiwing/ready_set_boole.git
 cd ready_set_boole && cargo test
 ```
 
-## Boolean Evaluation
+## Boolean Evaluation (exercise 3)
 
 The third exercise of the subject is about implementing a function which takes
 a formula in
@@ -75,7 +75,7 @@ Or like this: `((T ∨ T) ∨ ⊥) ⇔ T = T`
 Here the Logical Equivalence operation is the highest and will be fully
 evaluated last since it depends on every other operation result.
 
-## Truth Table
+## Truth Table (exercise 4)
 
 The other boolean-themed exercises introduce boolean variables. The 4th one is
 about printing the truth table of a given formula. This gives the result for
@@ -84,6 +84,10 @@ with a maximum time complexity of O(2^n). This is because a simple implentation
 of this function will replace each variable by a given literal value and call
 the `eval_formula()` on the result. Since a boolean has two possible values the
 number of operations will double for each additional variable in the formula.
+
+> The `print_truth_table()` function accepts every operator from the above table
+> except for the literals '0' and '1' which are replaced by letters from 'A' to
+> 'Z' (each representing a different variable).
 
 ### example:
 
@@ -109,13 +113,44 @@ let formula = "AB|C&";
 print_truth_table(formula);
 ```
 
-| A | B | C | = |
-|---|---|---|---|
-| 0 | 0 | 0 | 0 |
-| 0 | 0 | 1 | 0 |
-| 0 | 1 | 0 | 0 |
-| 0 | 1 | 1 | 1 |
-| 1 | 0 | 0 | 0 |
-| 1 | 0 | 1 | 1 |
-| 1 | 1 | 0 | 0 |
-| 1 | 1 | 1 | 1 |
+| A | B | C | = | *Formula*       |
+|---|---|---|---|-----------------|
+| 0 | 0 | 0 | 0 | (⊥ ∨ ⊥) ∧ ⊥ = ⊥ |
+| 0 | 0 | 1 | 0 | (⊥ ∨ ⊥) ∧ T = ⊥ |
+| 0 | 1 | 0 | 0 | (⊥ ∨ T) ∧ ⊥ = ⊥ |
+| 0 | 1 | 1 | 1 | (⊥ ∨ T) ∧ T = T |
+| 1 | 0 | 0 | 0 | (T ∨ ⊥) ∧ ⊥ = ⊥ |
+| 1 | 0 | 1 | 1 | (T ∨ ⊥) ∧ T = T |
+| 1 | 1 | 0 | 0 | (T ∨ T) ∧ ⊥ = ⊥ |
+| 1 | 1 | 1 | 1 | (T ∨ T) ∧ T = T |
+
+## Alternative Forms (exercises 5 and 6)
+
+The next exercises are about implementing functions that convert the given
+propositional formulas into predefined forms through rewriting rules.
+
+The `negation_normal_form()` function takes a formula and converts it into
+[NNF](https://en.wikipedia.org/wiki/Negation_normal_form). The NNF makes every
+negation 'go down' the formula tree so that they can only take variables as
+operands. It also replaces every Exclusive Disjunction, Material Condition and
+Logical Equivalence by equivalent propositions only using Variables, Negations,
+Disjunctions and Conjunctions.
+
+The `conjunctive_normal_form()` function converts the given formula into
+[CNF](https://en.wikipedia.org/wiki/Conjunctive_normal_form). CNF has the same
+requirements as NNF. So every CNF proposition is also NNF but not the reverse
+since it adds an other condition. A CNF proposition is conjunction of multiple
+clauses where a clause is itself a disjunction of literals. This means that in
+reverse polish notation every Conjunctive operator must be at the end of the
+formula.
+
+This is done using the following rewriting rules:
+
+* Double Negation: *¬¬A ⇔ A*
+* De Morgan's Law 1: *¬(A ∨ B) ⇔ ¬A ∧ ¬B*
+* De Morgan's Law 2: *¬(A ∧ B) ⇔ ¬A ∨ ¬B*
+* Exclusive Disjunction: *A ⊕ B ⇔ (A ∧ ¬B) ∨ (¬A ∧ B)*
+* Material Condition: *A ⇒ B ⇔ ¬A ∨ B*
+* Logical Equivalence: *(A ⇔ B) ⇔ (A ⇒ B) ∧ (B ⇒ A)*
+* Conjunctive Distributivity: *A ∧ (B ∨ C) ⇔ (A ∧ B) ∨ (A ∧ C)*
+* Disjunctive Distributivity: *A ∨ (B ∧ C) ⇔ (A ∨ B) ∧ (A ∨ C)*
