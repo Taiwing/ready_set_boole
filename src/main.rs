@@ -1041,9 +1041,37 @@ mod tests {
 			let y_in = ((coordinates & 0xffff0000) >> 16) as u16;
 			let result = map(x_in, y_in);
 			let (x_out, y_out) = reverse_map(result);
-			assert_eq!(x_in, x_out);
-			assert_eq!(y_in, y_out);
+			assert_eq!(x_out, x_in);
+			assert_eq!(y_out, y_in);
 		}
+	}
+
+	#[test]
+	fn reverse_map_to_map() {
+		let n_in = 0.0;
+		let (x, y) = reverse_map(n_in);
+		let n_out = map(x, y);
+		assert_eq!(n_out, n_in);
+
+		let n_in = 0.25;
+		let (x, y) = reverse_map(n_in);
+		let n_out = map(x, y);
+		assert_eq!(n_out, n_in);
+
+		let n_in = 0.5;
+		let (x, y) = reverse_map(n_in);
+		let n_out = map(x, y);
+		assert_eq!(n_out, n_in);
+
+		let n_in = 0.75;
+		let (x, y) = reverse_map(n_in);
+		let n_out = map(x, y);
+		assert_eq!(n_out, n_in);
+
+		let n_in = 1.0;
+		let (x, y) = reverse_map(n_in);
+		let n_out = map(x, y);
+		assert_eq!(n_out, n_in);
 	}
 
 	#[test]
