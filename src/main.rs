@@ -1033,4 +1033,16 @@ mod tests {
 			assert!(result <= 1.0);
 		}
 	}
+
+	#[test]
+	fn map_to_reverse_map() {
+		for coordinates in (0..=u32::MAX).step_by(4444) {
+			let x_in = (coordinates & 0xffff) as u16;
+			let y_in = ((coordinates & 0xffff0000) >> 16) as u16;
+			let result = map(x_in, y_in);
+			let (x_out, y_out) = reverse_map(result);
+			assert_eq!(x_in, x_out);
+			assert_eq!(y_in, y_out);
+		}
+	}
 }
