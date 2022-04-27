@@ -127,7 +127,11 @@ print_truth_table(formula);
 ## Alternative Forms (exercises 5 and 6)
 
 The next exercises are about implementing functions that convert the given
-propositional formulas into predefined forms through rewriting rules.
+propositional formulas into predefined forms through rewriting rules. In the
+implementation of the following functions an
+[AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree) has been chosen to
+represent the formulas because it is one of the easiest ways to apply the
+rewriting rules below.
 
 The `negation_normal_form()` function takes a formula and converts it into
 [NNF](https://en.wikipedia.org/wiki/Negation_normal_form). The NNF makes every
