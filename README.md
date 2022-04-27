@@ -86,27 +86,34 @@ number of operations will double for each additional variable in the formula.
 ### example:
 
 ```rust
-let formula = "ABCD||=";
+let formula = "AB|";
 print_truth_table(formula);
 ```
 
 Will print:
 
-| A | B | C | D | = |
-|---|---|---|---|---|
-| 0 | 0 | 0 | 0 | 1 |
-| 0 | 0 | 0 | 1 | 0 |
-| 0 | 0 | 1 | 0 | 0 |
-| 0 | 0 | 1 | 1 | 0 |
-| 0 | 1 | 0 | 0 | 0 |
-| 0 | 1 | 0 | 1 | 0 |
-| 0 | 1 | 1 | 0 | 0 |
-| 0 | 1 | 1 | 1 | 0 |
-| 1 | 0 | 0 | 0 | 0 |
-| 1 | 0 | 0 | 1 | 1 |
-| 1 | 0 | 1 | 0 | 1 |
-| 1 | 0 | 1 | 1 | 1 |
-| 1 | 1 | 0 | 0 | 1 |
-| 1 | 1 | 0 | 1 | 1 |
-| 1 | 1 | 1 | 0 | 1 |
-| 1 | 1 | 1 | 1 | 1 |
+| A | B | = |
+|---|---|---|
+| 0 | 0 | 0 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 1 |
+
+Which is simply the truth table for the Disjunction (OR) operator. But if we add
+an other variable, the table will be twice as big:
+
+```rust
+let formula = "AB|C&";
+print_truth_table(formula);
+```
+
+| A | B | C | = |
+|---|---|---|---|
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 1 | 0 |
+| 0 | 1 | 0 | 0 |
+| 0 | 1 | 1 | 1 |
+| 1 | 0 | 0 | 0 |
+| 1 | 0 | 1 | 1 |
+| 1 | 1 | 0 | 0 |
+| 1 | 1 | 1 | 1 |
