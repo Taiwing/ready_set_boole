@@ -27,7 +27,7 @@ cd ready_set_boole && cargo test
 ## Boolean Evaluation (exercise 3)
 
 The third exercise of the subject is about implementing a function which takes
-a formula in
+a boolean formula in
 [reverse polish notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation),
 evaluates it and returns the result in O(n) time. This means that the execution
 time must grow linearily to the size of the input. Simply put, evaluation of a
@@ -38,7 +38,8 @@ This is done with a simple boolean stack. The formula string is read character
 by character. Each literal symbol (true or false) is directly pushed to the
 stack. When an operator character is found, one value is poped from the stack
 if it's a negation and two for every other operation. The actual operation is
-then performed and the result is pushed to the stack.
+then performed and the result is pushed to the stack. The last boolean value in
+the stack will be the result for the entire formula.
 
 ### Operations
 
@@ -63,7 +64,7 @@ println!("result: {}", eval_formula(formula));
 ```
 
 More Complex formulas are hard to read and are better understood when
-represented in a tree format, which is easy to do from RPN string.
+represented in a tree format, which is easy to do from a RPN string.
 
 For example `"1011||="` can be represented like this:
 
