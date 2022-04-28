@@ -4,11 +4,16 @@ This is an educational project in the 42 cursus. It's about boolean logic, sets,
 group theory and more. I chose Rust for this project as the language was free
 and the examples were written specifically for it.
 
+<br />
+<p align="center">
+  <img src="https://github.com/Taiwing/ready_set_boole/blob/master/resources/Boole.jpg?raw=true" alt="George Boole" style="width: 50%;"/>
+</p>
+
+## Setup
+
 This project includes library files, an empty main function and a big test
 suite. The main function is for live testing by the corrector of the project.
 The test suite is to make sure I did not screw up too badly.
-
-## Setup
 
 ```shell
 # clone it
