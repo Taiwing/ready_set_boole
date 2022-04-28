@@ -168,6 +168,7 @@ in its general form, which is:
 > ∧ (P<sub>2</sub> ∨ Q<sub>2</sub>) ... ∧ (P<sub>2</sub> ∨ Q<sub>m</sub>) ∧ ...
 > ∧ (P<sub>n</sub> ∨ Q<sub>1</sub>) ∧ (P<sub>n</sub> ∨ Q<sub>2</sub>) ...
 > ∧ (P<sub>n</sub> ∨ Q<sub>m</sub>)*
+
 Where every P and Q is a disjunction of literals, meaning that they do not
 contain any conjunction so that every operand is either a literal, a negation of
 a literal or a disjunction.
