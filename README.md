@@ -6,7 +6,9 @@ and the examples were written specifically for it.
 
 <br />
 <p align="center">
-  <img src="https://github.com/Taiwing/ready_set_boole/blob/master/resources/Boole.jpg?raw=true" alt="George Boole" style="width: 50%;"/>
+  <a href="https://en.wikipedia.org/wiki/George_Boole">
+    <img src="https://github.com/Taiwing/ready_set_boole/blob/master/resources/Boole.jpg?raw=true" alt="George Boole" title="George Boole" style="width: 50%;"/>
+  </a>
 </p>
 
 ## Setup
