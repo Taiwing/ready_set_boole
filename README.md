@@ -159,13 +159,18 @@ This is done using the following rewriting rules:
 * Conjunctive Distributivity: *A ∧ (B ∨ C) ⇔ (A ∧ B) ∨ (A ∧ C)*
 * Disjunctive Distributivity: *A ∨ (B ∧ C) ⇔ (A ∨ B) ∧ (A ∨ C)*
 
-> To make a given formula CNF the distributivity rules must be applied in their
-> general form, which is:  
-> *(P1 ∧ P2 ... ∧ Pn) ∨ (Q1 ∧ Q2 ... ∧ Qm) ⇔
-> (P1 ∨ Q1) ∧ (P1 ∨ Q2) ... ∧ (P1 ∨ Qm)
-> ∧ (P2 ∨ Q1) ∧ (P2 ∨ Q2) ... ∧ (P2 ∨ Qm)
-> ∧ ... ∧ (Pn ∨ Q1) ∧ (Pn ∨ Q2) ... ∧ (Pn ∨ Qm)*  
-> Where every P and Q is a disjunction of literals.
+To make a given formula CNF, the dijunctive distributivity rule must be applied
+in its general form, which is:
+> *(P<sub>1</sub> ∧ P<sub>2</sub> ... ∧ P<sub>n</sub>)
+> ∨ (Q<sub>1</sub> ∧ Q<sub>2</sub> ... ∧ Q<sub>m</sub>) ⇔
+> (P<sub>1</sub> ∨ Q<sub>1</sub>) ∧ (P<sub>1</sub> ∨ Q<sub>2</sub>) ...
+> ∧ (P<sub>1</sub> ∨ Q<sub>m</sub>) ∧ (P<sub>2</sub> ∨ Q<sub>1</sub>)
+> ∧ (P<sub>2</sub> ∨ Q<sub>2</sub>) ... ∧ (P<sub>2</sub> ∨ Q<sub>m</sub>) ∧ ...
+> ∧ (P<sub>n</sub> ∨ Q<sub>1</sub>) ∧ (P<sub>n</sub> ∨ Q<sub>2</sub>) ...
+> ∧ (P<sub>n</sub> ∨ Q<sub>m</sub>)*  
+Where every P and Q is a disjunction of literals, meaning that they do not
+contain any conjunction so that every operand is either a literal, a negation of
+a literal or a disjunction.
 
 ### example:
 
