@@ -30,9 +30,9 @@ The third exercise of the subject is about implementing a function which takes
 a boolean formula in
 [reverse polish notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation),
 evaluates it and returns the result in O(n) time. This means that the execution
-time must grow linearily to the size of the input. Simply put, evaluation of a
-formula 10 times bigger than an other one should take no more than 10 times
-longer.
+time must grow linearily relative to the size of the input. Simply put,
+evaluation of a formula 10 times bigger than an other one should take no more
+than 10 times longer.
 
 This is done with a simple boolean stack. The formula string is read character
 by character. Each literal symbol (true or false) is directly pushed to the
